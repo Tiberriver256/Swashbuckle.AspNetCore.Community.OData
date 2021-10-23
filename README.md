@@ -11,3 +11,7 @@ Provides support for Microsoft.AspNetCore.OData in Swashbuckle.
 ## Getting Started
 
 Please see the example project StartUp for how to set this up.
+
+![SampleSwaggerGen.png](./Images/SampleSwaggerGen.png)
+
+![SampleSwaggerGen2.png](./Images/SampleSwaggerGen2.png)
