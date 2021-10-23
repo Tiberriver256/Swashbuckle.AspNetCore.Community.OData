@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup Label="Build">
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Package">
+    <Product>Swashbuckle.AspNetCore.Community.Odata</Product>
+    <Description>Provides support for Microsoft.AspNetCore.OData in Swashbuckle</Description>
+    <PackageTags>Tag1;Tag2;Tag3</PackageTags>
+  </PropertyGroup>
+
+</Project>
