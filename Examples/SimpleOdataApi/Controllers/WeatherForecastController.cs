@@ -1,7 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace SimpleODataApi.Controllers
+namespace SimpleOdataApi.Controllers
 {
     [Route("odata")]
     public class WeatherForecastController : ODataController
@@ -18,12 +23,13 @@ namespace SimpleODataApi.Controllers
         [HttpGet("WeatherForecasts")]
         public IEnumerable<WeatherForecast> GetForecasts()
         {
+            var rng = new Random();
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
                 Id = index,
                 Date = DateTime.Now.AddDays(index),
-                TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
+                TemperatureC = rng.Next(-20, 55),
+                Summary = Summaries[rng.Next(Summaries.Length)]
             })
             .ToArray();
         }
@@ -31,19 +37,15 @@ namespace SimpleODataApi.Controllers
         [HttpGet("WeatherForecasts({Id})")]
         public WeatherForecast? GetForecastById(int Id)
         {
-            if (Id == null)
-            {
-                throw new ArgumentNullException(nameof(Id));
-            }
-
+            var rng = new Random();
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
                 Id = index,
                 Date = DateTime.Now.AddDays(index),
-                TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
+                TemperatureC = rng.Next(-20, 55),
+                Summary = Summaries[rng.Next(Summaries.Length)]
             })
-            .FirstOrDefault(w => w.Id == Id);
+             .FirstOrDefault(w => w.Id == Id);
         }
     }
 }

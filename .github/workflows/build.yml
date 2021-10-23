@@ -35,9 +35,6 @@ jobs:
           fetch-depth: 0
       - name: "Install .NET Core SDK"
         uses: actions/setup-dotnet@v1.8.2
-        with:
-          dotnet-version: '6.0.x'
-          include-prerelease: true
       - name: "Dotnet Tool Restore"
         run: dotnet tool restore
         shell: pwsh
