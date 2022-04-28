@@ -23,7 +23,7 @@
     <PackageReference Include="Microsoft.OpenApi.OData" Version="1.0.9" />
     <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="6.2.3" />
     <PackageReference Include="Microsoft.AspNetCore.OData">
-      <Version>8.0.3</Version>
+      <Version>8.0.10</Version>
     </PackageReference>
   </ItemGroup>
 
