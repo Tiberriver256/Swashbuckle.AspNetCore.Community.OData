@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="6.1.0" />
-    <PackageReference Include="Microsoft.OData.ModelBuilder" Version="1.0.7" />
+    <PackageReference Include="Microsoft.OData.ModelBuilder" Version="1.0.9" />
   </ItemGroup>
 
   <ItemGroup Label="Project References">
