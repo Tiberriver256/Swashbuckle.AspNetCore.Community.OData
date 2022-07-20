@@ -21,7 +21,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.OData.Edm" Version="7.9.2" />
     <PackageReference Include="Microsoft.OpenApi.OData" Version="1.0.9" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="6.2.3" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="6.4.0" />
     <PackageReference Include="Microsoft.AspNetCore.OData">
       <Version>8.0.10</Version>
     </PackageReference>
