@@ -164,7 +164,7 @@ csharp_prefer_braces = true:warning
 csharp_prefer_simple_using_statement = true:suggestion
 dotnet_diagnostic.IDE0063.severity = suggestion
 # 'using' directive preferences
-csharp_using_directive_placement = inside_namespace:warning
+csharp_using_directive_placement = outside_namespace:warning
 # Modifier preferences
 csharp_prefer_static_local_function = true:warning
 
@@ -419,6 +419,12 @@ dotnet_naming_rule.parameters_rule.severity             = warning
 # Justification: Comments turned off
 # https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/SA1633.md
 dotnet_diagnostic.SA1633.severity = none
+
+# SA1206: Declaration keywords must follow order
+# Justification: This rule is disabled because order is already covered by builtin analyzers
+# https://github.com/DotNetAnalyzers/StyleCopAnalyzers/blob/master/documentation/SA1206.md
+dotnet_diagnostic.SA1206.severity = none
+
 
 ##########################################
 # License

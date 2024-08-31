@@ -1,11 +1,11 @@
+using System;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
+using Swashbuckle.AspNetCore.Swagger;
+
 namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection
 {
-    using System;
-    using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Extensions.DependencyInjection.Extensions;
-    using Microsoft.Extensions.Options;
-    using Swashbuckle.AspNetCore.Swagger;
-
     /// <summary>
     /// Public static methods for injecting an ISwaggerProvider OData implementation into the service collection.
     /// </summary>

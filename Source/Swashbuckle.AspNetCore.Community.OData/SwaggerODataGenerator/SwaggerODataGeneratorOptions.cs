@@ -1,9 +1,9 @@
+using System.Collections.Generic;
+using Microsoft.OData.Edm;
+using Microsoft.OpenApi.Models;
+
 namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection
 {
-    using System.Collections.Generic;
-    using Microsoft.OData.Edm;
-    using Microsoft.OpenApi.Models;
-
     /// <summary>
     /// Options required to generate Swagger from your OData API.
     /// </summary>

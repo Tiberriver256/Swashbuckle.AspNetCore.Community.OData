@@ -17,9 +17,8 @@
     <PackageReference Include="Microsoft.OData.Edm" Version="8.0.1" />
     <PackageReference Include="Microsoft.OpenApi.OData" Version="1.6.8" />
     <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="6.7.3" />
-    <PackageReference Include="Microsoft.AspNetCore.OData" Version="8.2.5" />
+    <PackageReference Include="Microsoft.AspNetCore.OData" Version="9.0.0" />
     <PackageReference Update="Microsoft.SourceLink.GitHub" Version="8.0.0" />
-    <PackageReference Update="Microsoft.VisualStudio.Threading.Analyzers" Version="17.11.20" />
     <PackageReference Update="MinVer" Version="5.0.0" />
   </ItemGroup>
 </Project>

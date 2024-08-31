@@ -11,19 +11,13 @@ using Swashbuckle.AspNetCore.Community.OData.DependencyInjection;
 
 namespace SimpleOdataApi
 {
-    public class Startup
+    public class Startup(IConfiguration configuration)
     {
-        public Startup(IConfiguration configuration)
-        {
-            Configuration = configuration;
-        }
-
-        public IConfiguration Configuration { get; }
+        public IConfiguration Configuration { get; } = configuration;
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
             services.AddControllers().AddOData(o => o.AddRouteComponents("odata", GetEdmModel()));
             services.AddSwaggerGenOData(opt => opt.SwaggerDoc("v1", "odata", new OpenApiInfo
             {
@@ -46,15 +40,9 @@ namespace SimpleOdataApi
 
             app.UseSwagger();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+            app.UseEndpoints(endpoints => endpoints.MapControllers());
 
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("v1/swagger.json", "My OData API");
-            });
+            app.UseSwaggerUI(c => c.SwaggerEndpoint("v1/swagger.json", "My OData API"));
         }
 
         private static IEdmModel GetEdmModel()
@@ -76,7 +64,7 @@ namespace SimpleOdataApi
                 .IsInsertable(false)
                 .HasDescription("Not supported");
 
-            builder.EntitySet<WeatherForecast>("WeatherForecasts").HasCountRestrictions().;
+            builder.EntitySet<WeatherForecast>("WeatherForecasts");
 
             return builder.GetEdmModel();
         }

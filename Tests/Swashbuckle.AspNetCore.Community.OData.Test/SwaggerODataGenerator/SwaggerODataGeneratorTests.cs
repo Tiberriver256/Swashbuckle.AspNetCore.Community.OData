@@ -1,12 +1,12 @@
+using FluentAssertions;
+using Microsoft.Extensions.Options;
+using Microsoft.OData.Edm;
+using Microsoft.OData.ModelBuilder;
+using Microsoft.OpenApi.Models;
+using Xunit;
+
 namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection.Tests
 {
-    using FluentAssertions;
-    using Microsoft.Extensions.Options;
-    using Microsoft.OData.Edm;
-    using Microsoft.OData.ModelBuilder;
-    using Microsoft.OpenApi.Models;
-    using Xunit;
-
     public class SwaggerODataGeneratorTests
     {
         [Fact]
@@ -38,7 +38,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection.Tests
             return builder.GetEdmModel();
         }
 
-        private class Person
+        private sealed class Person
         {
             public int Id { get; set; }
 

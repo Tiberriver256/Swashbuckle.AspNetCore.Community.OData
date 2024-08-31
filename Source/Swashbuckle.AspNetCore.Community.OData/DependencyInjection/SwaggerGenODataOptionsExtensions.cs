@@ -1,7 +1,7 @@
+using Microsoft.OpenApi.Models;
+
 namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection
 {
-    using Microsoft.OpenApi.Models;
-
     /// <summary>
     /// Static methods for working with <see cref="SwaggerGenODataOptions"/> class.
     /// </summary>

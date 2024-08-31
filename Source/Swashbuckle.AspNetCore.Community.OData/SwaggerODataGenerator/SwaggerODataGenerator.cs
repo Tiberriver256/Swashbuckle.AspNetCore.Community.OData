@@ -1,28 +1,27 @@
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using Microsoft.Extensions.Options;
+using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi.OData;
+using Swashbuckle.AspNetCore.Swagger;
+
 namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using Microsoft.Extensions.Options;
-    using Microsoft.OpenApi.Models;
-    using Microsoft.OpenApi.OData;
-    using Swashbuckle.AspNetCore.Swagger;
-
     /// <summary>
     /// The Swagger generator for OData Edm Models.
     /// </summary>
-    public class SwaggerODataGenerator : ISwaggerProvider
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="SwaggerODataGenerator"/> class.
+    /// </remarks>
+    /// <param name="options">The options configured during startup.</param>
+    public class SwaggerODataGenerator(IOptions<SwaggerODataGeneratorOptions> options) : ISwaggerProvider
     {
         /// <summary>
         /// Options for the swagger generator.
         /// </summary>
-        private readonly SwaggerODataGeneratorOptions options;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SwaggerODataGenerator"/> class.
-        /// </summary>
-        /// <param name="options">The options configured during startup.</param>
-        public SwaggerODataGenerator(IOptions<SwaggerODataGeneratorOptions> options) => this.options = options.Value ?? new SwaggerODataGeneratorOptions();
+        private readonly SwaggerODataGeneratorOptions options = options.Value ?? new SwaggerODataGeneratorOptions();
 
         /// <inheritdoc/>
         public OpenApiDocument GetSwagger(string documentName, string? host = null, string? basePath = null)
@@ -39,17 +38,13 @@ namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection
 
             var document = edmModel.ConvertToOpenApi();
             document.Info = info.ApiInfo;
-            document.Servers = new List<OpenApiServer> { new OpenApiServer() { Url = $"/{info.OdataRoute}" } };
+            document.Servers = [new() { Url = $"/{info.OdataRoute}" }];
 
             return document;
         }
 
-        private class UnknownODataEdm : InvalidOperationException
+        private sealed class UnknownODataEdm(string documentName, IEnumerable<string> knownEdmModels) : InvalidOperationException(string.Format(CultureInfo.InvariantCulture, "Unknown EdmModel document - \"{0}\". Known EdmModels: {1}", documentName, string.Join(",", knownEdmModels.Select((string x) => "\"" + x + "\""))))
         {
-            public UnknownODataEdm(string documentName, IEnumerable<string> knownEdmModels)
-                : base(string.Format("Unknown EdmModel document - \"{0}\". Known EdmModels: {1}", documentName, string.Join(",", knownEdmModels?.Select((string x) => "\"" + x + "\""))))
-            {
-            }
         }
     }
 }

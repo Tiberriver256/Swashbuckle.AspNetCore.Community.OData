@@ -19,4 +19,10 @@
     <PackageReference Update="Microsoft.VisualStudio.Threading.Analyzers" Version="17.11.20" />
     <PackageReference Update="MinVer" Version="5.0.0" />
   </ItemGroup>
+  <ItemGroup>
+    <EditorConfigFiles Remove="C:\my\personal\Swashbuckle.AspNetCore.Community.OData\Examples\SimpleOdataApi\.editorconfig" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="C:\my\personal\Swashbuckle.AspNetCore.Community.OData\Examples\SimpleOdataApi\.editorconfig" />
+  </ItemGroup>
 </Project>

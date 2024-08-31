@@ -38,3 +38,8 @@ dotnet_diagnostic.CA1062.severity = none
 # Justification: Test method names contain underscores
 # https://docs.microsoft.com/en-us/visualstudio/code-quality/ca1707
 dotnet_diagnostic.CA1707.severity = none
+
+# CS1591: Missing XML comment for publicly visible type or member
+# Justification: Tests don't require XML comments
+# https://docs.microsoft.com/en-us/visualstudio/code-quality/cs1591
+dotnet_diagnostic.CS1591.severity = none
