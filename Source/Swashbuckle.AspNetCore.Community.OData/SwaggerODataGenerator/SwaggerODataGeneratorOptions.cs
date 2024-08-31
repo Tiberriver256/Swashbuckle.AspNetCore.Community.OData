@@ -21,7 +21,10 @@ namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection
         /// <summary>
         /// Gets or sets swagger documents that have been parsed from the OData Edm Models.
         /// </summary>
-        public IDictionary<string, (string OdataRoute, OpenApiInfo ApiInfo)> SwaggerDocs { get; set; }
+        public IDictionary<
+            string,
+            (string OdataRoute, OpenApiInfo ApiInfo)
+        > SwaggerDocs { get; set; }
 
         /// <summary>
         /// Gets or sets OData Edm Models.

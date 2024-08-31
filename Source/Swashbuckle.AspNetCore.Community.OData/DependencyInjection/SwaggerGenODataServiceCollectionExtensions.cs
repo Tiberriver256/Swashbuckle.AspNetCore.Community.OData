@@ -19,13 +19,19 @@ namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection
         /// <returns>A service collection.</returns>
         public static IServiceCollection AddSwaggerGenOData(
             this IServiceCollection services,
-            Action<SwaggerGenODataOptions> setupAction)
+            Action<SwaggerGenODataOptions> setupAction
+        )
         {
-            services.AddTransient<IConfigureOptions<SwaggerODataGeneratorOptions>, ConfigureSwaggerODataGeneratorOptions>();
+            services.AddTransient<
+                IConfigureOptions<SwaggerODataGeneratorOptions>,
+                ConfigureSwaggerODataGeneratorOptions
+            >();
 
             services.TryAddTransient<ISwaggerProvider, SwaggerODataGenerator>();
 
-            services.TryAddTransient(s => s.GetRequiredService<IOptions<SwaggerODataGeneratorOptions>>().Value);
+            services.TryAddTransient(s =>
+                s.GetRequiredService<IOptions<SwaggerODataGeneratorOptions>>().Value
+            );
 
             if (setupAction != null)
             {
@@ -42,6 +48,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection
         /// <param name="setupAction">The actions to perform.</param>
         public static void ConfigureSwaggerODataGen(
             this IServiceCollection services,
-            Action<SwaggerGenODataOptions> setupAction) => services.Configure(setupAction);
+            Action<SwaggerGenODataOptions> setupAction
+        ) => services.Configure(setupAction);
     }
 }

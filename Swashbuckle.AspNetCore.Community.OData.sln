@@ -77,6 +77,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{19
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleOdataApi", "Examples\SimpleOdataApi\SimpleOdataApi.csproj", "{22BCB82C-4504-4577-ACA5-F7DBD9DC3E00}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".husky", ".husky", "{FC6E12AF-F637-426B-9624-200454FC487C}"
+	ProjectSection(SolutionItems) = preProject
+		.husky\pre-commit = .husky\pre-commit
+		.husky\task-runner.json = .husky\task-runner.json
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -108,6 +114,7 @@ Global
 		{841C67EF-BBB2-4730-8E29-22FF3FD54306} = {EFE1E5ED-D337-4874-82EC-D9FA0BC7D3AB}
 		{194BF3FD-A541-4917-A30D-950EB60B3587} = {7EDFA103-DB69-4C88-9DE4-97ADBF8253A1}
 		{22BCB82C-4504-4577-ACA5-F7DBD9DC3E00} = {194BF3FD-A541-4917-A30D-950EB60B3587}
+		{FC6E12AF-F637-426B-9624-200454FC487C} = {F20E2797-D1E3-4321-91BB-FAE54954D2A0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {73F36209-F8D6-4066-8951-D97729F773CF}

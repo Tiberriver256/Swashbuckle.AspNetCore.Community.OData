@@ -8,6 +8,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection
         /// <summary>
         /// Gets or sets the SwaggerGeneratorODataOptions.
         /// </summary>
-        public SwaggerODataGeneratorOptions SwaggerGeneratorODataOptions { get; set; } = new SwaggerODataGeneratorOptions();
+        public SwaggerODataGeneratorOptions SwaggerGeneratorODataOptions { get; set; } =
+            new SwaggerODataGeneratorOptions();
     }
 }

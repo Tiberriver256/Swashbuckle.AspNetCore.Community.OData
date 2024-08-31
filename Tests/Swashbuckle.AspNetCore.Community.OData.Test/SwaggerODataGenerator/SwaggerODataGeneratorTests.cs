@@ -14,10 +14,15 @@ namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection.Tests
         {
             // Arrange
             var swaggerGeneratorODataOptions = new SwaggerODataGeneratorOptions();
-            swaggerGeneratorODataOptions.SwaggerDocs.Add("v1", ("odata", new OpenApiInfo { Version = "V1", Title = "Test API" }));
+            swaggerGeneratorODataOptions.SwaggerDocs.Add(
+                "v1",
+                ("odata", new OpenApiInfo { Version = "V1", Title = "Test API" })
+            );
             swaggerGeneratorODataOptions.EdmModels.Add("odata", GetFakeEdmModel());
 
-            var subject = new SwaggerODataGenerator(options: Options.Create(swaggerGeneratorODataOptions));
+            var subject = new SwaggerODataGenerator(
+                options: Options.Create(swaggerGeneratorODataOptions)
+            );
 
             // Act
             var document = subject.GetSwagger("v1");

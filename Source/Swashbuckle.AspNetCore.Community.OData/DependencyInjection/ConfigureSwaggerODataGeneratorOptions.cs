@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-using Microsoft.Extensions.Options;
+using System.Linq;
 using Microsoft.AspNetCore.OData;
+using Microsoft.Extensions.Options;
 using Microsoft.OData.Edm;
 using Microsoft.OpenApi.Models;
-using System.Linq;
 
 namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection
 {
@@ -15,7 +15,10 @@ namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection
     /// </remarks>
     /// <param name="opts">Options injected.</param>
     /// <param name="odataOpts">OData options</param>
-    public class ConfigureSwaggerODataGeneratorOptions(IOptions<SwaggerGenODataOptions> opts, IOptions<ODataOptions> odataOpts) : IConfigureOptions<SwaggerODataGeneratorOptions>
+    public class ConfigureSwaggerODataGeneratorOptions(
+        IOptions<SwaggerGenODataOptions> opts,
+        IOptions<ODataOptions> odataOpts
+    ) : IConfigureOptions<SwaggerODataGeneratorOptions>
     {
         private readonly ODataOptions odataOptions = odataOpts.Value;
         private readonly SwaggerGenODataOptions options = opts.Value;
@@ -37,7 +40,10 @@ namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection
             }
         }
 
-        private static void DeepCopy(SwaggerODataGeneratorOptions source, SwaggerODataGeneratorOptions target)
+        private static void DeepCopy(
+            SwaggerODataGeneratorOptions source,
+            SwaggerODataGeneratorOptions target
+        )
         {
             target.SwaggerDocs = new Dictionary<string, (string, OpenApiInfo)>(source.SwaggerDocs);
             target.EdmModels = new Dictionary<string, IEdmModel>(source.EdmModels);

@@ -19,11 +19,13 @@ namespace SimpleOdataApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers().AddOData(o => o.AddRouteComponents("odata", GetEdmModel()));
-            services.AddSwaggerGenOData(opt => opt.SwaggerDoc("v1", "odata", new OpenApiInfo
-            {
-                Title = "My Open API",
-                Version = "v1",
-            }));
+            services.AddSwaggerGenOData(opt =>
+                opt.SwaggerDoc(
+                    "v1",
+                    "odata",
+                    new OpenApiInfo { Title = "My Open API", Version = "v1" }
+                )
+            );
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -49,17 +51,19 @@ namespace SimpleOdataApi
         {
             var builder = new ODataConventionModelBuilder();
 
-            builder.EntityType<WeatherForecast>()
-                .HasKey(f => f.Id);
-            builder.EntityType<WeatherForecast>()
+            builder.EntityType<WeatherForecast>().HasKey(f => f.Id);
+            builder
+                .EntityType<WeatherForecast>()
                 .HasDeleteRestrictions()
                 .IsDeletable(false)
                 .HasDescription("Not supported");
-            builder.EntityType<WeatherForecast>()
+            builder
+                .EntityType<WeatherForecast>()
                 .HasUpdateRestrictions()
                 .IsUpdatable(false)
                 .HasDescription("Not supported");
-            builder.EntityType<WeatherForecast>()
+            builder
+                .EntityType<WeatherForecast>()
                 .HasInsertRestrictions()
                 .IsInsertable(false)
                 .HasDescription("Not supported");
