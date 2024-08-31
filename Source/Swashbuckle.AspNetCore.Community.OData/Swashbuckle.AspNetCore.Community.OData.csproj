@@ -1,30 +1,25 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup Label="Build">
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
-
   <PropertyGroup Label="Package">
     <Product>Swashbuckle.AspNetCore.Community.Odata</Product>
     <Description>Provides support for Microsoft.AspNetCore.OData in Swashbuckle</Description>
     <PackageTags>OData;Swashbuckle;Swagger;OpenAPI</PackageTags>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
   </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="Microsoft.OData.Edm" Version="7.9.2" />
-    <PackageReference Include="Microsoft.OpenApi.OData" Version="1.0.9" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="6.2.3" />
-    <PackageReference Include="Microsoft.AspNetCore.OData">
-      <Version>8.0.10</Version>
-    </PackageReference>
+    <PackageReference Include="Microsoft.OData.Edm" Version="8.0.1" />
+    <PackageReference Include="Microsoft.OpenApi.OData" Version="1.6.8" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="6.7.3" />
+    <PackageReference Include="Microsoft.AspNetCore.OData" Version="8.2.5" />
+    <PackageReference Update="Microsoft.SourceLink.GitHub" Version="8.0.0" />
+    <PackageReference Update="Microsoft.VisualStudio.Threading.Analyzers" Version="17.11.20" />
+    <PackageReference Update="MinVer" Version="5.0.0" />
   </ItemGroup>
-
 </Project>

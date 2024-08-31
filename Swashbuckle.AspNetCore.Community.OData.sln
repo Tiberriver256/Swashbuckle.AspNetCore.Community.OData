@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31423.177
@@ -75,7 +75,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{194BF3FD-A541-4917-A30D-950EB60B3587}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SimpleOdataApi", "Examples\SimpleOdataApi\SimpleOdataApi.csproj", "{22BCB82C-4504-4577-ACA5-F7DBD9DC3E00}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleOdataApi", "Examples\SimpleOdataApi\SimpleOdataApi.csproj", "{22BCB82C-4504-4577-ACA5-F7DBD9DC3E00}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

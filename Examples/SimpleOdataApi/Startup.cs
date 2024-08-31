@@ -1,19 +1,13 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Community.OData.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace SimpleOdataApi
 {
@@ -70,13 +64,19 @@ namespace SimpleOdataApi
             builder.EntityType<WeatherForecast>()
                 .HasKey(f => f.Id);
             builder.EntityType<WeatherForecast>()
-                .HasDeleteRestrictions().HasDescription("Not supported");
+                .HasDeleteRestrictions()
+                .IsDeletable(false)
+                .HasDescription("Not supported");
             builder.EntityType<WeatherForecast>()
-                .HasUpdateRestrictions().HasDescription("Not supported");
+                .HasUpdateRestrictions()
+                .IsUpdatable(false)
+                .HasDescription("Not supported");
             builder.EntityType<WeatherForecast>()
-                .HasInsertRestrictions().HasDescription("Not supported");
+                .HasInsertRestrictions()
+                .IsInsertable(false)
+                .HasDescription("Not supported");
 
-            builder.EntitySet<WeatherForecast>("WeatherForecasts");
+            builder.EntitySet<WeatherForecast>("WeatherForecasts").HasCountRestrictions().;
 
             return builder.GetEdmModel();
         }
