@@ -13,7 +13,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Update="Microsoft.NET.Test.Sdk" Version="17.11.0" />
+    <PackageReference Update="Microsoft.NET.Test.Sdk" Version="17.11.1" />
     <PackageReference Update="Microsoft.VisualStudio.Threading.Analyzers" Version="17.11.20" />
     <PackageReference Update="MinVer" Version="5.0.0" />
     <PackageReference Update="Moq" Version="4.20.70" />
