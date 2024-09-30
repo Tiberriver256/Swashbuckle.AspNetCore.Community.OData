@@ -16,7 +16,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.OData.Edm" Version="8.0.1" />
     <PackageReference Include="Microsoft.OpenApi.OData" Version="1.6.8" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="6.8.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="6.8.1" />
     <PackageReference Include="Microsoft.AspNetCore.OData" Version="9.0.0" />
     <PackageReference Update="Microsoft.SourceLink.GitHub" Version="8.0.0" />
     <PackageReference Update="MinVer" Version="5.0.0" />
