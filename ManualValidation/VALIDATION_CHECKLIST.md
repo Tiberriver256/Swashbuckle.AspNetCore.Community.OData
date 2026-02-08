@@ -5,11 +5,11 @@ This checklist verifies that the enhanced OData Swagger implementation works cor
 ## 🚀 Running the Validation API
 
 ```bash
-cd ~/repos/Swashbuckle.AspNetCore.Community.OData/ManualValidation
+cd ManualValidation
 dotnet run
 ```
 
-Then open: **http://localhost:5000/swagger**
+Then open the Swagger URL printed at startup (commonly: **http://localhost:5000/swagger**).
 
 ## ✅ Validation Tests
 
@@ -110,7 +110,7 @@ GET /odata/Products?$select=Id,Name,Price
 GET /odata/Products?$expand=Category
 GET /odata/Products(1)
 GET /odata/Categories(1)/Name
-GET /odata/Suppliers/PrimarySupplier
+GET /odata/PrimarySupplier
 ```
 
 ### 12. OpenAPI Document Structure

@@ -32,11 +32,9 @@ The format is inspired by Keep a Changelog and uses semantic versioning.
 - Fixed multiple path handling and route prefix trimming edge cases.
 - Eliminated build warnings across solution and CI builds.
 
-## [2.0.0] - 2026-02-08
+## [2.0.0] - TBD
 
-### Notes
-
-This section is reserved for the next tagged release created from the changes currently in `Unreleased`.
+Release date is set when tag `v2.0.0` is created.
 
 ## [1.x and earlier]
 

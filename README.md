@@ -1,6 +1,6 @@
-# Swashbuckle.AspNetCore.Community.Odata
+# Swashbuckle.AspNetCore.Community.OData
 
-[![experimental](http://badges.github.io/stability-badges/dist/experimental.svg)](http://github.com/badges/stability-badges)
+[![experimental](https://badges.github.io/stability-badges/dist/experimental.svg)](https://github.com/badges/stability-badges)
 
 [![GitHub Actions Status](https://github.com/tiberriver256/Swashbuckle.AspNetCore.Community.OData/workflows/Build/badge.svg?branch=main)](https://github.com/tiberriver256/Swashbuckle.AspNetCore.Community.OData/actions) [![Swashbuckle.AspNetCore.Community.OData NuGet Package Downloads](https://img.shields.io/nuget/dt/Swashbuckle.AspNetCore.Community.OData)](https://www.nuget.org/packages/Swashbuckle.AspNetCore.Community.OData)
 
@@ -67,6 +67,9 @@ public void ConfigureServices(IServiceCollection services)
             FilterExample = "Name eq 'John' and Age gt 18"
         }
     );
+
+    // Add Swashbuckle services
+    services.AddSwaggerGen();
 }
 
 public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -100,7 +103,36 @@ private static IEdmModel GetEdmModel()
 }
 ```
 
-## 📖 What's New in v2.0
+### 3. Configure in Program.cs (minimal hosting)
+
+```csharp
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllers()
+    .AddOData(o => o
+        .AddRouteComponents("odata", GetEdmModel())
+        .EnableQueryFeatures(100));
+
+builder.Services.AddEnhancedSwaggerGenODataWithQueryOptions(
+    odataSetupAction: opt =>
+    {
+        opt.SwaggerDoc("v1", "odata", new OpenApiInfo
+        {
+            Title = "My OData API",
+            Version = "v1"
+        });
+    });
+
+builder.Services.AddSwaggerGen();
+
+var app = builder.Build();
+app.UseSwagger();
+app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "My OData API v1"));
+app.MapControllers();
+app.Run();
+```
+
+## 📖 Upcoming in v2.0 (Unreleased)
 
 ### Enhanced Features
 
@@ -110,7 +142,8 @@ private static IEdmModel GetEdmModel()
 - **Method Overload Support**: Multiple actions with same name are correctly documented
 - **Better HTTP Semantics**: Accurate methods, status codes, request/response schemas
 
-See [ENHANCED_FEATURES.md](./ENHANCED_FEATURES.md) for detailed documentation.
+Track current release status in [RELEASE_NOTES.md](./RELEASE_NOTES.md#unreleased).
+See [ENHANCED_FEATURES.md](./ENHANCED_FEATURES.md) for detailed feature documentation.
 
 ## 📊 Comparison with Other Approaches
 

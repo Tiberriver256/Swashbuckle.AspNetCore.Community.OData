@@ -55,11 +55,12 @@ further defined and clarified by project maintainers.
 ## Enforcement
 
 Instances of abusive, harassing, or otherwise unacceptable behaviour may be
-reported by opening a private discussion with maintainers or by opening an issue
-in this repository and requesting maintainer contact:
+reported through a private GitHub security advisory in this repository.
+This advisory channel is also used for confidential Code of Conduct reports:
 
-- https://github.com/tiberriver256/Swashbuckle.AspNetCore.Community.OData/discussions
-- https://github.com/tiberriver256/Swashbuckle.AspNetCore.Community.OData/issues
+- https://github.com/tiberriver256/Swashbuckle.AspNetCore.Community.OData/security/advisories/new
+
+Public GitHub issues/discussions should not be used for sensitive incident reports.
 
 All complaints will be reviewed and investigated and will result in a response that
 is deemed necessary and appropriate to the circumstances. The project team is

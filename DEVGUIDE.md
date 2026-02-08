@@ -48,13 +48,14 @@ dotnet-outdated ManualValidation/ManualValidation.csproj
 ## Release process
 
 1. Ensure `main` is green and up to date.
-2. Update `RELEASE_NOTES.md`:
+2. Bump package version metadata in the library project file.
+3. Update `RELEASE_NOTES.md`:
    - move relevant items from `Unreleased` into a new version section.
    - call out breaking changes clearly.
-3. Verify package metadata and docs links.
-4. Create version tag (for example `v2.0.0`).
-5. Publish GitHub release from the tag.
-6. GitHub Actions release pipeline pushes package artifacts.
+4. Verify package metadata, docs links, and version consistency.
+5. Create and push version tag from that commit (for example `v2.0.0`).
+6. Publish GitHub release from the tag.
+7. Verify NuGet package version and published release notes match the tag.
 
 ## CI model summary
 

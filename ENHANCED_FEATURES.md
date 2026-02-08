@@ -28,6 +28,23 @@ services.AddEnhancedSwaggerGenODataWithQueryOptions(
         FilterExample = "Name eq 'John' and Age gt 18"
     }
 );
+
+// Add Swashbuckle services
+services.AddSwaggerGen();
+```
+
+Minimal-hosting equivalent:
+
+```csharp
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddEnhancedSwaggerGenODataWithQueryOptions(
+    odataSetupAction: opt =>
+    {
+        opt.SwaggerDoc("v1", "odata", new OpenApiInfo { Title = "My OData API", Version = "v1" });
+    });
+
+builder.Services.AddSwaggerGen();
 ```
 
 ## ✨ Key Features
