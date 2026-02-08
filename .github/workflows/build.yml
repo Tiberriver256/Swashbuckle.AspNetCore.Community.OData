@@ -88,6 +88,33 @@ jobs:
         uses: actions/download-artifact@v7.0.0
         with:
           name: "windows-latest"
+      - name: "Validate package version matches release tag"
+        run: |
+          $expectedTag = "${{ github.ref_name }}"
+          $expectedVersion = $expectedTag -replace '^v', ''
+          $packages = Get-ChildItem .\ -Filter *.nupkg | Where-Object { !$_.Name.Contains('preview') }
+
+          if (!$packages)
+          {
+            throw "No stable .nupkg files found to publish."
+          }
+
+          foreach ($package in $packages)
+          {
+            $actualVersion = [System.Text.RegularExpressions.Regex]::Match($package.BaseName, '(?<version>\d+\.\d+\.\d+(?:[-+].+)?)$').Groups['version'].Value
+            if ([string]::IsNullOrWhiteSpace($actualVersion))
+            {
+              throw "Could not parse package version from '$($package.Name)'."
+            }
+
+            if ($actualVersion -ne $expectedVersion)
+            {
+              throw "Package '$($package.Name)' has version '$actualVersion' which does not match release tag '$expectedTag'."
+            }
+          }
+
+          Write-Host "Validated package versions match release tag $expectedTag"
+        shell: pwsh
       - name: "Dotnet NuGet Push"
         run: |
           Get-ChildItem .\ -Filter *.nupkg |

@@ -50,14 +50,14 @@ dotnet-outdated Examples/ValidationHarness/ValidationHarness.csproj
 ## Release process
 
 1. Ensure `main` is green and up to date.
-2. Bump package version metadata in the library project file.
-3. Update `RELEASE_NOTES.md`:
+2. Update `RELEASE_NOTES.md`:
    - move relevant items from `Unreleased` into a new version section.
    - call out breaking changes clearly.
-4. Verify package metadata, docs links, and version consistency.
-5. Create and push version tag from that commit (for example `v2.0.0`).
-6. Publish GitHub release from the tag.
-7. Verify NuGet package version and published release notes match the tag.
+3. Commit release notes and documentation updates.
+4. Create and push a semantic version tag using the `v` prefix (for example `v2.0.0`).
+   - Package version is derived from git tags via MinVer.
+5. Publish GitHub release from the tag.
+6. Verify NuGet package version and published release notes match the tag.
 
 ## CI model summary
 

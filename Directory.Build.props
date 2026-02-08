@@ -20,4 +20,8 @@
     <RepositoryType>git</RepositoryType>
     <PackageReleaseNotes>https://github.com/tiberriver256/Swashbuckle.AspNetCore.Community.OData/releases</PackageReleaseNotes>
   </PropertyGroup>
+
+  <ItemGroup Label="Versioning">
+    <PackageReference Include="MinVer" Version="5.0.0" PrivateAssets="all" />
+  </ItemGroup>
 </Project>

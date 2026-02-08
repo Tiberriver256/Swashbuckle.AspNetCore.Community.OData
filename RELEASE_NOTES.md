@@ -10,7 +10,12 @@ The format is inspired by Keep a Changelog and uses semantic versioning.
 
 ### Changed
 
+- Standardized MinVer configuration so package versions are derived consistently from git tags.
+- Clarified maintainer release workflow for tag-driven versioning in `DEVGUIDE.md`.
+
 ### Fixed
+
+- Added release workflow validation that checks `.nupkg` version matches the release tag before pushing to NuGet.
 
 ## [2.0.0] - 2026-02-08
 
