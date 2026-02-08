@@ -41,7 +41,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.ODataRouting
             var paths = provider.GetPaths(model, settings);
 
             // Assert
-            Assert.IsFalse(paths.Any());
+            Assert.IsEmpty(paths);
         }
 
         [TestMethod]
@@ -58,9 +58,9 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.ODataRouting
             var paths = provider.GetPaths(model, settings).ToList();
 
             // Assert
-            Assert.IsTrue(paths.Any());
-            Assert.IsTrue(paths.Any(p => p.PathTemplate == "/Products"));
-            Assert.IsTrue(paths.Any(p => p.PathTemplate == "/Products({key})"));
+            Assert.IsNotEmpty(paths);
+            Assert.Contains(p => p.PathTemplate == "/Products", paths);
+            Assert.Contains(p => p.PathTemplate == "/Products({key})", paths);
         }
 
         [TestMethod]
@@ -81,7 +81,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.ODataRouting
             var paths = provider.GetPaths(model, settings).ToList();
 
             // Assert
-            Assert.AreEqual(1, paths.Count);
+            Assert.HasCount(1, paths);
             Assert.IsTrue(paths.All(p => p.PathTemplate == "/Products"));
         }
 
@@ -104,8 +104,8 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.ODataRouting
 
             // Assert
             var productPath = paths.Single(p => p.PathTemplate == "/Products");
-            Assert.IsTrue(productPath.HttpMethods.Contains("GET"));
-            Assert.IsTrue(productPath.HttpMethods.Contains("POST"));
+            Assert.Contains("GET", productPath.HttpMethods);
+            Assert.Contains("POST", productPath.HttpMethods);
         }
 
         [TestMethod]
@@ -129,11 +129,11 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.ODataRouting
 
             // Assert
             var singleProductPath = paths.Single(p => p.PathTemplate.Contains("({key})"));
-            Assert.AreEqual(4, singleProductPath.HttpMethods.Count);
-            Assert.IsTrue(singleProductPath.HttpMethods.Contains("GET"));
-            Assert.IsTrue(singleProductPath.HttpMethods.Contains("PUT"));
-            Assert.IsTrue(singleProductPath.HttpMethods.Contains("PATCH"));
-            Assert.IsTrue(singleProductPath.HttpMethods.Contains("DELETE"));
+            Assert.HasCount(4, singleProductPath.HttpMethods);
+            Assert.Contains("GET", singleProductPath.HttpMethods);
+            Assert.Contains("PUT", singleProductPath.HttpMethods);
+            Assert.Contains("PATCH", singleProductPath.HttpMethods);
+            Assert.Contains("DELETE", singleProductPath.HttpMethods);
         }
 
         [TestMethod]

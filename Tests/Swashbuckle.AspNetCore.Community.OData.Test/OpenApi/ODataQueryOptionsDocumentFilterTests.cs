@@ -170,7 +170,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
             filter.Apply(document, context);
 
             // Assert
-            Assert.AreEqual(1, getOperation.Parameters.Count(p => p.Name == "$filter"));
+            Assert.ContainsSingle((OpenApiParameter p) => p.Name == "$filter", getOperation.Parameters);
         }
 
         [TestMethod]
@@ -216,7 +216,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
 
             var formatParam = GetSingleParameter(getOperation, "$format");
             Assert.IsNotNull(formatParam.Schema.Enum);
-            Assert.IsTrue(formatParam.Schema.Enum.Count > 0);
+            Assert.IsNotEmpty(formatParam.Schema.Enum);
         }
 
         [TestMethod]
@@ -241,7 +241,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
 
             // Assert - POST should not have query parameters
             var postOperation = productsPath.Operations[OperationType.Post];
-            Assert.IsFalse(postOperation.Parameters.Any(p => p.Name.StartsWith('$')));
+            Assert.DoesNotContain((OpenApiParameter p) => p.Name.StartsWith('$'), postOperation.Parameters);
         }
 
         [TestMethod]
@@ -324,19 +324,17 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
 
         private static void AssertHasParameter(OpenApiOperation operation, string parameterName)
         {
-            Assert.IsTrue(operation.Parameters.Any(p => p.Name == parameterName), $"Expected parameter '{parameterName}' to be present.");
+            Assert.Contains((OpenApiParameter p) => p.Name == parameterName, operation.Parameters, $"Expected parameter '{parameterName}' to be present.");
         }
 
         private static void AssertDoesNotHaveParameter(OpenApiOperation operation, string parameterName)
         {
-            Assert.IsFalse(operation.Parameters.Any(p => p.Name == parameterName), $"Expected parameter '{parameterName}' to be absent.");
+            Assert.DoesNotContain((OpenApiParameter p) => p.Name == parameterName, operation.Parameters, $"Expected parameter '{parameterName}' to be absent.");
         }
 
         private static OpenApiParameter GetSingleParameter(OpenApiOperation operation, string parameterName)
         {
-            var matches = operation.Parameters.Where(p => p.Name == parameterName).ToList();
-            Assert.AreEqual(1, matches.Count, $"Expected exactly one '{parameterName}' parameter.");
-            return matches[0];
+            return Assert.ContainsSingle((OpenApiParameter p) => p.Name == parameterName, operation.Parameters, $"Expected exactly one '{parameterName}' parameter.");
         }
 
         #endregion

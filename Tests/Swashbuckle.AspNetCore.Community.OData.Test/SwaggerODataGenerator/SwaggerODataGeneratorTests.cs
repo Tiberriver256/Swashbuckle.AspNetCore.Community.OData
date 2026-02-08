@@ -30,8 +30,8 @@ namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection.Tests
             // Assert
             Assert.AreEqual("V1", document.Info.Version);
             Assert.AreEqual("Test API", document.Info.Title);
-            Assert.IsTrue(document.Paths.Keys.Contains("/People"));
-            Assert.IsTrue(document.Paths.Keys.Contains("/People({Id})"));
+            Assert.Contains("/People", document.Paths.Keys);
+            Assert.Contains("/People({Id})", document.Paths.Keys);
         }
 
         private static IEdmModel GetFakeEdmModel()
