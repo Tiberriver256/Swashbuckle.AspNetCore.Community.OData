@@ -92,10 +92,7 @@ namespace SimpleOdataApi
             // });
 
             // Add standard SwaggerGen for non-OData endpoints (optional)
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("non-odata", new OpenApiInfo { Title = "Non-OData API", Version = "v1" });
-            });
+            services.AddSwaggerGen(c => c.SwaggerDoc("non-odata", new OpenApiInfo { Title = "Non-OData API", Version = "v1" }));
         }
 
         /// <summary>
@@ -127,10 +124,7 @@ namespace SimpleOdataApi
                 c.DisplayRequestDuration();
             });
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+            app.UseEndpoints(endpoints => endpoints.MapControllers());
         }
 
         /// <summary>

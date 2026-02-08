@@ -19,28 +19,29 @@ namespace Swashbuckle.AspNetCore.Community.OData.OpenApi
     /// Adds OData query options ($filter, $select, $expand, $orderby, $top, $skip, $count, $search)
     /// to GET operations for collection-style OData paths.
     /// </summary>
-    public class ODataQueryOptionsDocumentFilter : IDocumentFilter
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="ODataQueryOptionsDocumentFilter"/> class.
+    /// </remarks>
+    /// <param name="settings">The settings for OData query options.</param>
+    public class ODataQueryOptionsDocumentFilter(ODataQueryOptionsSettings? settings = null) : IDocumentFilter
     {
-        private readonly ODataQueryOptionsSettings _settings;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ODataQueryOptionsDocumentFilter"/> class.
-        /// </summary>
-        /// <param name="settings">The settings for OData query options.</param>
-        public ODataQueryOptionsDocumentFilter(ODataQueryOptionsSettings settings = null)
-        {
-            _settings = settings ?? new ODataQueryOptionsSettings();
-        }
+        private readonly ODataQueryOptionsSettings settingsValue = settings ?? new ODataQueryOptionsSettings();
 
         /// <inheritdoc/>
         public void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context)
         {
             foreach (var path in swaggerDoc.Paths)
             {
-                if (path.Value.Operations.TryGetValue(HttpMethod.Get, out var getOperation)
+                if (path.Value?.Operations is not { } operations)
+                {
+                    continue;
+                }
+
+                if (operations.TryGetValue(HttpMethod.Get, out var getOperation)
+                    && getOperation != null
                     && IsCollectionEndpoint(path.Key))
                 {
-                    AddODataQueryParameters(getOperation);
+                    this.AddODataQueryParameters(getOperation);
                 }
             }
         }
@@ -48,22 +49,22 @@ namespace Swashbuckle.AspNetCore.Community.OData.OpenApi
         /// <summary>
         /// Determines if the path represents a collection endpoint.
         /// </summary>
-        private bool IsCollectionEndpoint(string path)
+        private static bool IsCollectionEndpoint(string path)
         {
             // Collection endpoints typically don't end with )} which indicates a single entity key
-            // and don't contain $ref or property access
+            // and don't contain $ref or property access.
             if (path.Contains("({") || path.Contains("($"))
             {
                 return false;
             }
 
-            // Check if it ends with a key segment pattern
-            if (path.EndsWith(")") && path.Contains("("))
+            // Check if it ends with a key segment pattern.
+            if (path.EndsWith(')') && path.Contains('('))
             {
                 return false;
             }
 
-            // It's a collection if it doesn't have a key segment
+            // It's a collection if it doesn't have a key segment.
             return true;
         }
 
@@ -72,226 +73,202 @@ namespace Swashbuckle.AspNetCore.Community.OData.OpenApi
         /// </summary>
         private void AddODataQueryParameters(OpenApiOperation operation)
         {
-            operation.Parameters ??= new List<IOpenApiParameter>();
+            var operationParameters = operation.Parameters ??= [];
 
-            var parameters = new List<IOpenApiParameter>();
+            var parameters = new List<OpenApiParameter>();
 
-            if (_settings.EnableFilter)
+            if (this.settingsValue.EnableFilter)
             {
-                parameters.Add(CreateFilterParameter());
+                parameters.Add(this.CreateFilterParameter());
             }
 
-            if (_settings.EnableSelect)
+            if (this.settingsValue.EnableSelect)
             {
-                parameters.Add(CreateSelectParameter());
+                parameters.Add(this.CreateSelectParameter());
             }
 
-            if (_settings.EnableExpand)
+            if (this.settingsValue.EnableExpand)
             {
-                parameters.Add(CreateExpandParameter());
+                parameters.Add(this.CreateExpandParameter());
             }
 
-            if (_settings.EnableOrderBy)
+            if (this.settingsValue.EnableOrderBy)
             {
-                parameters.Add(CreateOrderByParameter());
+                parameters.Add(this.CreateOrderByParameter());
             }
 
-            if (_settings.EnableTop)
+            if (this.settingsValue.EnableTop)
             {
-                parameters.Add(CreateTopParameter());
+                parameters.Add(this.CreateTopParameter());
             }
 
-            if (_settings.EnableSkip)
+            if (this.settingsValue.EnableSkip)
             {
                 parameters.Add(CreateSkipParameter());
             }
 
-            if (_settings.EnableCount)
+            if (this.settingsValue.EnableCount)
             {
                 parameters.Add(CreateCountParameter());
             }
 
-            if (_settings.EnableSearch)
+            if (this.settingsValue.EnableSearch)
             {
                 parameters.Add(CreateSearchParameter());
             }
 
-            if (_settings.EnableFormat)
+            if (this.settingsValue.EnableFormat)
             {
                 parameters.Add(CreateFormatParameter());
             }
 
-            // Add parameters to operation
-            foreach (var parameter in parameters.Where(param => !operation.Parameters.Any(existing => existing.Name == param.Name)))
+            // Add parameters to operation.
+            foreach (var parameter in parameters.Where(param => !operationParameters.Any(existing => existing.Name == param.Name)))
             {
-                operation.Parameters.Add(parameter);
+                operationParameters.Add(parameter);
             }
 
-            // Add example response with @odata.count, @odata.nextLink if pagination enabled
-            if (_settings.EnablePagination && operation.Responses.TryGetValue("200", out var response))
+            // Add example response with @odata.count, @odata.nextLink if pagination enabled.
+            if (this.settingsValue.EnablePagination
+                && operation.Responses is { } responses
+                && responses.TryGetValue("200", out var response)
+                && response != null)
             {
                 AddPaginationResponseExample(response);
             }
         }
 
-        private IOpenApiParameter CreateFilterParameter()
+        private OpenApiParameter CreateFilterParameter() => new()
         {
-            return new OpenApiParameter
-            {
-                Name = "$filter",
-                In = ParameterLocation.Query,
-                Description = "Filter the results using OData filter expressions. " +
+            Name = "$filter",
+            In = ParameterLocation.Query,
+            Description = "Filter the results using OData filter expressions. " +
                     "Examples: Name eq 'John', Age gt 18, contains(Name, 'Smith')",
-                Required = false,
-                Schema = new OpenApiSchema
-                {
-                    Type = JsonSchemaType.String
-                },
-                Example = _settings.FilterExample != null ? JsonValue.Create(_settings.FilterExample) : null
-            };
-        }
-
-        private IOpenApiParameter CreateSelectParameter()
-        {
-            return new OpenApiParameter
+            Required = false,
+            Schema = new OpenApiSchema
             {
-                Name = "$select",
-                In = ParameterLocation.Query,
-                Description = "Select specific properties to include in the response. " +
+                Type = JsonSchemaType.String
+            },
+            Example = this.settingsValue.FilterExample != null ? JsonValue.Create(this.settingsValue.FilterExample) : null
+        };
+
+        private OpenApiParameter CreateSelectParameter() => new()
+        {
+            Name = "$select",
+            In = ParameterLocation.Query,
+            Description = "Select specific properties to include in the response. " +
                     "Example: $select=Name,Age,Email",
-                Required = false,
-                Schema = new OpenApiSchema
-                {
-                    Type = JsonSchemaType.String
-                },
-                Example = _settings.SelectExample != null ? JsonValue.Create(_settings.SelectExample) : null
-            };
-        }
-
-        private IOpenApiParameter CreateExpandParameter()
-        {
-            return new OpenApiParameter
+            Required = false,
+            Schema = new OpenApiSchema
             {
-                Name = "$expand",
-                In = ParameterLocation.Query,
-                Description = "Expand related entities. " +
+                Type = JsonSchemaType.String
+            },
+            Example = this.settingsValue.SelectExample != null ? JsonValue.Create(this.settingsValue.SelectExample) : null
+        };
+
+        private OpenApiParameter CreateExpandParameter() => new()
+        {
+            Name = "$expand",
+            In = ParameterLocation.Query,
+            Description = "Expand related entities. " +
                     "Examples: $expand=Orders, $expand=Orders($filter=Amount gt 100)",
-                Required = false,
-                Schema = new OpenApiSchema
-                {
-                    Type = JsonSchemaType.String
-                },
-                Example = _settings.ExpandExample != null ? JsonValue.Create(_settings.ExpandExample) : null
-            };
-        }
-
-        private IOpenApiParameter CreateOrderByParameter()
-        {
-            return new OpenApiParameter
+            Required = false,
+            Schema = new OpenApiSchema
             {
-                Name = "$orderby",
-                In = ParameterLocation.Query,
-                Description = "Order results by properties. " +
+                Type = JsonSchemaType.String
+            },
+            Example = this.settingsValue.ExpandExample != null ? JsonValue.Create(this.settingsValue.ExpandExample) : null
+        };
+
+        private OpenApiParameter CreateOrderByParameter() => new()
+        {
+            Name = "$orderby",
+            In = ParameterLocation.Query,
+            Description = "Order results by properties. " +
                     "Examples: $orderby=Name, $orderby=Age desc, $orderby=Name asc,Age desc",
-                Required = false,
-                Schema = new OpenApiSchema
-                {
-                    Type = JsonSchemaType.String
-                },
-                Example = _settings.OrderByExample != null ? JsonValue.Create(_settings.OrderByExample) : null
-            };
-        }
-
-        private IOpenApiParameter CreateTopParameter()
-        {
-            return new OpenApiParameter
+            Required = false,
+            Schema = new OpenApiSchema
             {
-                Name = "$top",
-                In = ParameterLocation.Query,
-                Description = $"Limit the number of results. Maximum: {_settings.MaxTop}",
-                Required = false,
-                Schema = new OpenApiSchema
-                {
-                    Type = JsonSchemaType.Integer,
-                    Format = "int32",
-                    Maximum = _settings.MaxTop.ToString(CultureInfo.InvariantCulture)
-                },
-                Example = JsonValue.Create(_settings.DefaultTop)
-            };
-        }
+                Type = JsonSchemaType.String
+            },
+            Example = this.settingsValue.OrderByExample != null ? JsonValue.Create(this.settingsValue.OrderByExample) : null
+        };
 
-        private IOpenApiParameter CreateSkipParameter()
+        private OpenApiParameter CreateTopParameter() => new()
         {
-            return new OpenApiParameter
+            Name = "$top",
+            In = ParameterLocation.Query,
+            Description = $"Limit the number of results. Maximum: {this.settingsValue.MaxTop}",
+            Required = false,
+            Schema = new OpenApiSchema
             {
-                Name = "$skip",
-                In = ParameterLocation.Query,
-                Description = "Skip the first N results (for pagination).",
-                Required = false,
-                Schema = new OpenApiSchema
-                {
-                    Type = JsonSchemaType.Integer,
-                    Format = "int32"
-                },
-                Example = JsonValue.Create(0)
-            };
-        }
+                Type = JsonSchemaType.Integer,
+                Format = "int32",
+                Maximum = this.settingsValue.MaxTop.ToString(CultureInfo.InvariantCulture)
+            },
+            Example = JsonValue.Create(this.settingsValue.DefaultTop)
+        };
 
-        private IOpenApiParameter CreateCountParameter()
+        private static OpenApiParameter CreateSkipParameter() => new()
         {
-            return new OpenApiParameter
+            Name = "$skip",
+            In = ParameterLocation.Query,
+            Description = "Skip the first N results (for pagination).",
+            Required = false,
+            Schema = new OpenApiSchema
             {
-                Name = "$count",
-                In = ParameterLocation.Query,
-                Description = "Include total count of results in response. " +
+                Type = JsonSchemaType.Integer,
+                Format = "int32"
+            },
+            Example = JsonValue.Create(0)
+        };
+
+        private static OpenApiParameter CreateCountParameter() => new()
+        {
+            Name = "$count",
+            In = ParameterLocation.Query,
+            Description = "Include total count of results in response. " +
                     "Set to true to include @odata.count in response.",
-                Required = false,
-                Schema = new OpenApiSchema
-                {
-                    Type = JsonSchemaType.Boolean
-                },
-                Example = JsonValue.Create(false)
-            };
-        }
-
-        private IOpenApiParameter CreateSearchParameter()
-        {
-            return new OpenApiParameter
+            Required = false,
+            Schema = new OpenApiSchema
             {
-                Name = "$search",
-                In = ParameterLocation.Query,
-                Description = "Free-text search across entity properties. " +
+                Type = JsonSchemaType.Boolean
+            },
+            Example = JsonValue.Create(false)
+        };
+
+        private static OpenApiParameter CreateSearchParameter() => new()
+        {
+            Name = "$search",
+            In = ParameterLocation.Query,
+            Description = "Free-text search across entity properties. " +
                     "Example: $search=blue shirt",
-                Required = false,
-                Schema = new OpenApiSchema
-                {
-                    Type = JsonSchemaType.String
-                }
-            };
-        }
-
-        private IOpenApiParameter CreateFormatParameter()
-        {
-            return new OpenApiParameter
+            Required = false,
+            Schema = new OpenApiSchema
             {
-                Name = "$format",
-                In = ParameterLocation.Query,
-                Description = "Specify response format. " +
+                Type = JsonSchemaType.String
+            }
+        };
+
+        private static OpenApiParameter CreateFormatParameter() => new()
+        {
+            Name = "$format",
+            In = ParameterLocation.Query,
+            Description = "Specify response format. " +
                     "Examples: application/json, application/json;odata.metadata=minimal",
-                Required = false,
-                Schema = new OpenApiSchema
-                {
-                    Type = JsonSchemaType.String,
-                    Enum = new List<JsonNode>
-                    {
+            Required = false,
+            Schema = new OpenApiSchema
+            {
+                Type = JsonSchemaType.String,
+                Enum =
+                    [
                         JsonValue.Create("application/json")!,
                         JsonValue.Create("application/json;odata.metadata=none")!,
                         JsonValue.Create("application/json;odata.metadata=minimal")!,
                         JsonValue.Create("application/json;odata.metadata=full")!
-                    }
-                }
-            };
-        }
+                    ]
+            }
+        };
 
         private static void AddPaginationResponseExample(IOpenApiResponse response)
         {
@@ -300,13 +277,13 @@ namespace Swashbuckle.AspNetCore.Community.OData.OpenApi
                 return;
             }
 
-            // Add odata.nextLink and odata.count to the schema description
+            // Add odata.nextLink and odata.count to the schema description.
             foreach (var content in response.Content.Values)
             {
                 if (content.Schema?.Items != null)
                 {
-                    // Collection response - add description about odata annotations
-                    content.Schema.Description = content.Schema.Description ?? "Response includes OData annotations: @odata.count, @odata.nextLink";
+                    // Collection response - add description about odata annotations.
+                    content.Schema.Description ??= "Response includes OData annotations: @odata.count, @odata.nextLink";
                 }
             }
         }
@@ -365,7 +342,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.OpenApi
         /// <summary>
         /// Enable $search parameter. Default: false.
         /// </summary>
-        public bool EnableSearch { get; set; } = false;
+        public bool EnableSearch { get; set; }
 
         /// <summary>
         /// Enable $format parameter. Default: true.

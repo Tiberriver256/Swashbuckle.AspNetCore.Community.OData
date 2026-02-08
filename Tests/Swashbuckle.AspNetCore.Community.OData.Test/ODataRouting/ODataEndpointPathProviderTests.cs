@@ -33,7 +33,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.ODataRouting
         {
             // Arrange
             var model = CreateSampleEdmModel();
-            var endpointDataSource = new TestEndpointDataSource(new List<Endpoint>());
+            var endpointDataSource = new TestEndpointDataSource([]);
             var provider = new ODataEndpointPathProvider(model, endpointDataSource, "odata");
             var settings = new OpenApiConvertSettings();
 
@@ -49,7 +49,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.ODataRouting
         {
             // Arrange
             var model = CreateSampleEdmModel();
-            var endpoints = this.CreateSampleODataEndpoints("odata", model);
+            var endpoints = CreateSampleODataEndpoints("odata", model);
             var endpointDataSource = new TestEndpointDataSource(endpoints);
             var provider = new ODataEndpointPathProvider(model, endpointDataSource, "odata");
             var settings = new OpenApiConvertSettings();
@@ -70,8 +70,8 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.ODataRouting
             var model = CreateSampleEdmModel();
             var endpoints = new List<Endpoint>
             {
-                this.CreateODataEndpoint("odata", "/odata/Products", model),
-                this.CreateODataEndpoint("v1", "/v1/Products", model)
+                CreateODataEndpoint("odata", "/odata/Products", model),
+                CreateODataEndpoint("v1", "/v1/Products", model)
             };
             var endpointDataSource = new TestEndpointDataSource(endpoints);
             var provider = new ODataEndpointPathProvider(model, endpointDataSource, "v1");
@@ -92,8 +92,8 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.ODataRouting
             var model = CreateSampleEdmModel();
             var endpoints = new List<Endpoint>
             {
-                this.CreateODataEndpointWithMethod("odata", "/odata/Products", "GET", model),
-                this.CreateODataEndpointWithMethod("odata", "/odata/Products", "POST", model)
+                CreateODataEndpointWithMethod("odata", "/odata/Products", "GET", model),
+                CreateODataEndpointWithMethod("odata", "/odata/Products", "POST", model)
             };
             var endpointDataSource = new TestEndpointDataSource(endpoints);
             var provider = new ODataEndpointPathProvider(model, endpointDataSource, "odata");
@@ -115,10 +115,10 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.ODataRouting
             var model = CreateSampleEdmModel();
             var endpoints = new List<Endpoint>
             {
-                this.CreateODataEndpointWithMethod("odata", "/odata/Products({key})", "GET", model),
-                this.CreateODataEndpointWithMethod("odata", "/odata/Products({key})", "PUT", model),
-                this.CreateODataEndpointWithMethod("odata", "/odata/Products({key})", "PATCH", model),
-                this.CreateODataEndpointWithMethod("odata", "/odata/Products({key})", "DELETE", model)
+                CreateODataEndpointWithMethod("odata", "/odata/Products({key})", "GET", model),
+                CreateODataEndpointWithMethod("odata", "/odata/Products({key})", "PUT", model),
+                CreateODataEndpointWithMethod("odata", "/odata/Products({key})", "PATCH", model),
+                CreateODataEndpointWithMethod("odata", "/odata/Products({key})", "DELETE", model)
             };
             var endpointDataSource = new TestEndpointDataSource(endpoints);
             var provider = new ODataEndpointPathProvider(model, endpointDataSource, "odata");
@@ -128,7 +128,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.ODataRouting
             var paths = provider.GetPaths(model, settings).ToList();
 
             // Assert
-            var singleProductPath = paths.Single(p => p.PathTemplate.Contains("({key})"));
+            var singleProductPath = paths.Single(p => p.PathTemplate?.Contains("({key})") == true);
             Assert.HasCount(4, singleProductPath.HttpMethods);
             Assert.Contains("GET", singleProductPath.HttpMethods);
             Assert.Contains("PUT", singleProductPath.HttpMethods);
@@ -141,17 +141,18 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.ODataRouting
         {
             // Arrange
             var model = CreateSampleEdmModel();
-            var endpointDataSource = new TestEndpointDataSource(new List<Endpoint>());
+            var endpointDataSource = new TestEndpointDataSource([]);
             var provider = new ODataEndpointPathProvider(model, endpointDataSource, "odata");
 
             // Act & Assert
             Assert.IsTrue(provider.CanFilter(null!));
+            Assert.IsNotNull(model.EntityContainer);
             Assert.IsTrue(provider.CanFilter(model.EntityContainer));
         }
 
         #region Helper Methods
 
-        private IEdmModel CreateSampleEdmModel()
+        private static IEdmModel CreateSampleEdmModel()
         {
             var builder = new ODataConventionModelBuilder();
             builder.EntitySet<Product>("Products");
@@ -159,23 +160,17 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.ODataRouting
             return builder.GetEdmModel();
         }
 
-        private List<Endpoint> CreateSampleODataEndpoints(string prefix, IEdmModel model)
-        {
-            return new List<Endpoint>
-            {
-                this.CreateODataEndpointWithMethod(prefix, $"/{prefix}/Products", "GET", model),
-                this.CreateODataEndpointWithMethod(prefix, $"/{prefix}/Products({{key}})", "GET", model),
-                this.CreateODataEndpointWithMethod(prefix, $"/{prefix}/Products({{key}})", "PUT", model),
-                this.CreateODataEndpointWithMethod(prefix, $"/{prefix}/Categories", "GET", model)
-            };
-        }
+        private static List<Endpoint> CreateSampleODataEndpoints(string prefix, IEdmModel model) =>
+            [
+                CreateODataEndpointWithMethod(prefix, $"/{prefix}/Products", "GET", model),
+                CreateODataEndpointWithMethod(prefix, $"/{prefix}/Products({{key}})", "GET", model),
+                CreateODataEndpointWithMethod(prefix, $"/{prefix}/Products({{key}})", "PUT", model),
+                CreateODataEndpointWithMethod(prefix, $"/{prefix}/Categories", "GET", model)
+            ];
 
-        private Endpoint CreateODataEndpoint(string prefix, string path, IEdmModel model)
-        {
-            return this.CreateODataEndpointWithMethod(prefix, path, "GET", model);
-        }
+        private static RouteEndpoint CreateODataEndpoint(string prefix, string path, IEdmModel model) => CreateODataEndpointWithMethod(prefix, path, "GET", model);
 
-        private Endpoint CreateODataEndpointWithMethod(string prefix, string rawText, string httpMethod, IEdmModel model)
+        private static RouteEndpoint CreateODataEndpointWithMethod(string prefix, string rawText, string httpMethod, IEdmModel model)
         {
             var routePattern = RoutePatternFactory.Parse(rawText);
             var entitySetName = rawText.Trim('/').Split('/').Last().Split('(')[0];
@@ -183,7 +178,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.ODataRouting
                 ?? throw new InvalidOperationException($"Entity set '{entitySetName}' not found.");
 
             var metadataCollection = new EndpointMetadataCollection(
-                new HttpMethodMetadata(new[] { httpMethod }),
+                new HttpMethodMetadata([httpMethod]),
                 new TestODataRoutingMetadata(prefix, model, new ODataPathTemplate(new EntitySetSegmentTemplate(entitySet)))
             );
 
@@ -200,57 +195,45 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.ODataRouting
 
         #region Test Classes
 
-        private class Product
+        private sealed class Product
         {
             public int Id { get; set; }
             public string Name { get; set; } = string.Empty;
             public decimal Price { get; set; }
         }
 
-        private class Category
+        private sealed class Category
         {
             public int Id { get; set; }
             public string Name { get; set; } = string.Empty;
         }
 
-        private class TestEndpointDataSource : EndpointDataSource
+        private sealed class TestEndpointDataSource(List<Endpoint> endpoints) : EndpointDataSource
         {
-            private readonly List<Endpoint> _endpoints;
-
-            public TestEndpointDataSource(List<Endpoint> endpoints)
-            {
-                _endpoints = endpoints;
-            }
+            private readonly List<Endpoint> endpointsValue = endpoints;
 
             public override IChangeToken GetChangeToken() => new NullChangeToken();
 
-            public override IReadOnlyList<Endpoint> Endpoints => _endpoints;
+            public override IReadOnlyList<Endpoint> Endpoints => this.endpointsValue;
         }
 
-        private class NullChangeToken : IChangeToken
+        private sealed class NullChangeToken : IChangeToken
         {
             public bool HasChanged => false;
             public bool ActiveChangeCallbacks => false;
             public IDisposable RegisterChangeCallback(Action<object?> callback, object? state) => new NullDisposable();
         }
 
-        private class NullDisposable : IDisposable
+        private sealed class NullDisposable : IDisposable
         {
             public void Dispose() { }
         }
 
-        private class TestODataRoutingMetadata : IODataRoutingMetadata
+        private sealed class TestODataRoutingMetadata(string prefix, IEdmModel model, ODataPathTemplate template) : IODataRoutingMetadata
         {
-            public TestODataRoutingMetadata(string prefix, IEdmModel model, ODataPathTemplate template)
-            {
-                Prefix = prefix;
-                Model = model;
-                Template = template;
-            }
-
-            public string Prefix { get; }
-            public IEdmModel Model { get; }
-            public ODataPathTemplate Template { get; }
+            public string Prefix { get; } = prefix;
+            public IEdmModel Model { get; } = model;
+            public ODataPathTemplate Template { get; } = template;
             public bool IsConventional => true;
         }
 

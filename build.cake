@@ -58,7 +58,7 @@ Task("Pack")
     .Does(() =>
     {
         DotNetCorePack(
-            ".",
+            "./Source/Swashbuckle.AspNetCore.Community.OData/Swashbuckle.AspNetCore.Community.OData.csproj",
             new DotNetCorePackSettings()
             {
                 Configuration = configuration,

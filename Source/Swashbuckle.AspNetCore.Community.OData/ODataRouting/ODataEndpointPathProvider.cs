@@ -23,26 +23,18 @@ namespace Swashbuckle.AspNetCore.Community.OData.ODataRouting
     /// This captures real controller endpoints with their HTTP methods,
     /// enabling accurate OpenAPI generation that reflects the actual API surface.
     /// </summary>
-    public class ODataEndpointPathProvider : IODataPathProvider
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="ODataEndpointPathProvider"/> class.
+    /// </remarks>
+    /// <param name="model">The EDM model.</param>
+    /// <param name="endpointDataSource">The endpoint data source.</param>
+    /// <param name="routePrefix">The route prefix (e.g., "odata", "v1").</param>
+    public class ODataEndpointPathProvider(IEdmModel model, EndpointDataSource endpointDataSource, string routePrefix) : IODataPathProvider
     {
-        private readonly IEdmModel _model;
-        private readonly EndpointDataSource _endpointDataSource;
-        private readonly string _routePrefix;
-        private readonly IList<ODataPath> _paths;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ODataEndpointPathProvider"/> class.
-        /// </summary>
-        /// <param name="model">The EDM model.</param>
-        /// <param name="endpointDataSource">The endpoint data source.</param>
-        /// <param name="routePrefix">The route prefix (e.g., "odata", "v1").</param>
-        public ODataEndpointPathProvider(IEdmModel model, EndpointDataSource endpointDataSource, string routePrefix)
-        {
-            _model = model ?? throw new ArgumentNullException(nameof(model));
-            _endpointDataSource = endpointDataSource ?? throw new ArgumentNullException(nameof(endpointDataSource));
-            _routePrefix = routePrefix ?? string.Empty;
-            _paths = new List<ODataPath>();
-        }
+        private readonly IEdmModel modelValue = model ?? throw new ArgumentNullException(nameof(model));
+        private readonly EndpointDataSource endpointDataSourceValue = endpointDataSource ?? throw new ArgumentNullException(nameof(endpointDataSource));
+        private readonly string routePrefixValue = routePrefix ?? string.Empty;
+        private readonly IList<ODataPath> paths = [];
 
         /// <inheritdoc/>
         public bool CanFilter(IEdmElement element) => true;
@@ -50,13 +42,13 @@ namespace Swashbuckle.AspNetCore.Community.OData.ODataRouting
         /// <inheritdoc/>
         public IEnumerable<ODataPath> GetPaths(IEdmModel model, OpenApiConvertSettings settings)
         {
-            if (_paths.Any())
+            if (this.paths.Count > 0)
             {
-                return _paths;
+                return this.paths;
             }
 
-            CollectPathsFromEndpoints();
-            return _paths;
+            this.CollectPathsFromEndpoints();
+            return this.paths;
         }
 
         /// <summary>
@@ -66,7 +58,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.ODataRouting
         {
             var templateToPathDict = new Dictionary<string, ODataPath>();
 
-            foreach (var endpoint in _endpointDataSource.Endpoints)
+            foreach (var endpoint in this.endpointDataSourceValue.Endpoints)
             {
                 var metadata = endpoint.Metadata.GetMetadata<IODataRoutingMetadata>();
                 if (metadata == null)
@@ -75,7 +67,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.ODataRouting
                 }
 
                 // Filter by route prefix
-                if (!string.IsNullOrEmpty(_routePrefix) && !metadata.Prefix.Equals(_routePrefix, StringComparison.OrdinalIgnoreCase))
+                if (!string.IsNullOrEmpty(this.routePrefixValue) && !metadata.Prefix.Equals(this.routePrefixValue, StringComparison.OrdinalIgnoreCase))
                 {
                     continue;
                 }
@@ -86,7 +78,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.ODataRouting
                 }
 
                 // Extract route template (remove prefix)
-                string routeTemplate = ExtractRouteTemplate(routeEndpoint, metadata.Prefix);
+                var routeTemplate = ExtractRouteTemplate(routeEndpoint, metadata.Prefix);
                 if (string.IsNullOrEmpty(routeTemplate))
                 {
                     continue;
@@ -94,7 +86,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.ODataRouting
 
                 // Get HTTP methods from endpoint
                 var httpMethods = GetHttpMethods(endpoint).ToArray();
-                if (!httpMethods.Any())
+                if (httpMethods.Length == 0)
                 {
                     // Default to GET if no methods specified
                     httpMethods = ["GET"];
@@ -112,7 +104,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.ODataRouting
                 }
 
                 // Translate path template to ODataPath
-                var path = TranslatePathTemplate(metadata.Template, _model);
+                var path = TranslatePathTemplate(metadata.Template, this.modelValue);
                 if (path == null)
                 {
                     continue;
@@ -127,7 +119,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.ODataRouting
                     path.HttpMethods.Add(method);
                 }
 
-                _paths.Add(path);
+                this.paths.Add(path);
                 templateToPathDict[routeTemplate] = path;
             }
         }
@@ -135,9 +127,9 @@ namespace Swashbuckle.AspNetCore.Community.OData.ODataRouting
         /// <summary>
         /// Extracts the route template from a RouteEndpoint, removing the OData prefix.
         /// </summary>
-        private static string ExtractRouteTemplate(RouteEndpoint routeEndpoint, string prefix)
+        private static string? ExtractRouteTemplate(RouteEndpoint routeEndpoint, string prefix)
         {
-            string rawText = routeEndpoint.RoutePattern.RawText;
+            var rawText = routeEndpoint.RoutePattern.RawText;
             if (string.IsNullOrWhiteSpace(rawText))
             {
                 return null;
@@ -158,7 +150,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.ODataRouting
         /// <summary>
         /// Translates an ODataPathTemplate to an ODataPath with actual segment mappings.
         /// </summary>
-        private ODataPath TranslatePathTemplate(ODataPathTemplate template, IEdmModel model)
+        private static ODataPath? TranslatePathTemplate(ODataPathTemplate template, IEdmModel model)
         {
             if (template.Count == 0)
             {
@@ -176,37 +168,34 @@ namespace Swashbuckle.AspNetCore.Community.OData.ODataRouting
                 }
             }
 
-            return segments.Any() ? new ODataPath(segments) : null;
+            return segments.Count > 0 ? new ODataPath(segments) : null;
         }
 
         /// <summary>
         /// Translates a segment template to an OData segment.
         /// </summary>
-        private static ODataSegment TranslateSegment(ODataSegmentTemplate segment, IEdmModel model)
+        private static ODataSegment? TranslateSegment(ODataSegmentTemplate segment, IEdmModel model) => segment switch
         {
-            return segment switch
-            {
-                EntitySetSegmentTemplate entitySet => new ODataNavigationSourceSegment(entitySet.Segment.EntitySet),
-                SingletonSegmentTemplate singleton => new ODataNavigationSourceSegment(singleton.Singleton),
-                KeySegmentTemplate key => new ODataKeySegment(key.EntityType, key.KeyMappings),
-                CastSegmentTemplate cast => new ODataTypeCastSegment(cast.ExpectedType as IEdmEntityType, model),
-                NavigationSegmentTemplate navigation => new ODataNavigationPropertySegment(navigation.Segment.NavigationProperty),
-                NavigationLinkSegmentTemplate navLink => new ODataNavigationPropertySegment(navLink.NavigationProperty),
-                FunctionSegmentTemplate function => new ODataOperationSegment(function.Function),
-                ActionSegmentTemplate action => new ODataOperationSegment(action.Action),
-                FunctionImportSegmentTemplate funcImport => new ODataOperationImportSegment(funcImport.FunctionImport, funcImport.ParameterMappings),
-                ActionImportSegmentTemplate actionImport => new ODataOperationImportSegment(actionImport.ActionImport),
-                PropertySegmentTemplate property when property.Property.Type.IsComplex() => new ODataComplexPropertySegment(property.Property),
-                CountSegmentTemplate _ => new ODataDollarCountSegment(),
-                MetadataSegmentTemplate => new ODataMetadataSegment(),
-                _ => null
-            };
-        }
+            EntitySetSegmentTemplate entitySet => new ODataNavigationSourceSegment(entitySet.Segment.EntitySet),
+            SingletonSegmentTemplate singleton => new ODataNavigationSourceSegment(singleton.Singleton),
+            KeySegmentTemplate key => new ODataKeySegment(key.EntityType, key.KeyMappings),
+            CastSegmentTemplate cast when cast.ExpectedType is IEdmEntityType entityType => new ODataTypeCastSegment(entityType, model),
+            NavigationSegmentTemplate navigation => new ODataNavigationPropertySegment(navigation.Segment.NavigationProperty),
+            NavigationLinkSegmentTemplate navLink => new ODataNavigationPropertySegment(navLink.NavigationProperty),
+            FunctionSegmentTemplate function => new ODataOperationSegment(function.Function),
+            ActionSegmentTemplate action => new ODataOperationSegment(action.Action),
+            FunctionImportSegmentTemplate funcImport => new ODataOperationImportSegment(funcImport.FunctionImport, funcImport.ParameterMappings),
+            ActionImportSegmentTemplate actionImport => new ODataOperationImportSegment(actionImport.ActionImport),
+            PropertySegmentTemplate property when property.Property.Type.IsComplex() => new ODataComplexPropertySegment(property.Property),
+            CountSegmentTemplate => new ODataDollarCountSegment(),
+            MetadataSegmentTemplate => new ODataMetadataSegment(),
+            _ => null
+        };
 
         private static string RemovePrefixSegment(string rawText, string prefix)
         {
             var normalizedPath = rawText.Trim();
-            if (!normalizedPath.StartsWith("/", StringComparison.Ordinal))
+            if (!normalizedPath.StartsWith('/'))
             {
                 normalizedPath = "/" + normalizedPath.TrimStart('/');
             }
@@ -234,7 +223,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.ODataRouting
             var prefixWithTrailingSlash = prefixSegment + "/";
             if (normalizedPath.StartsWith(prefixWithTrailingSlash, comparison))
             {
-                var remaining = normalizedPath.Substring(prefixWithTrailingSlash.Length);
+                var remaining = normalizedPath[prefixWithTrailingSlash.Length..];
                 return "/" + remaining.TrimStart('/');
             }
 

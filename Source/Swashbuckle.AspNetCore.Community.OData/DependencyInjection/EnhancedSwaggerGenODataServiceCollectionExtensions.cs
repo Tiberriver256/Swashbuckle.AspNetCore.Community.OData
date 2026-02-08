@@ -8,10 +8,10 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.OpenApi;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.Community.OData.OpenApi;
 using Swashbuckle.AspNetCore.Community.OData.SwaggerODataGenerator;
 using Swashbuckle.AspNetCore.Swagger;
@@ -33,11 +33,11 @@ namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection
         /// <returns>The service collection.</returns>
         public static IServiceCollection AddEnhancedSwaggerGenOData(
             this IServiceCollection services,
-            Action<SwaggerGenODataOptions> setupAction = null)
+            Action<SwaggerGenODataOptions>? setupAction = null)
         {
             // Register options
             services.AddOptions<SwaggerGenODataOptions>();
-            
+
             if (setupAction != null)
             {
                 services.Configure(setupAction);
@@ -62,7 +62,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection
             {
                 // Get the endpoint data source from the routing services
                 var compositeDataSource = sp.GetService<CompositeEndpointDataSource>();
-                return compositeDataSource ?? new CompositeEndpointDataSource(Array.Empty<EndpointDataSource>());
+                return compositeDataSource ?? new CompositeEndpointDataSource([]);
             });
 
             return services;
@@ -77,8 +77,8 @@ namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection
         /// <returns>The service collection.</returns>
         public static IServiceCollection AddEnhancedSwaggerGenODataWithQueryOptions(
             this IServiceCollection services,
-            Action<SwaggerGenODataOptions> odataSetupAction = null,
-            ODataQueryOptionsSettings queryOptionsSettings = null)
+            Action<SwaggerGenODataOptions>? odataSetupAction = null,
+            ODataQueryOptionsSettings? queryOptionsSettings = null)
         {
             var resolvedQueryOptionsSettings = queryOptionsSettings ?? new ODataQueryOptionsSettings();
 
@@ -86,16 +86,10 @@ namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection
             services.AddEnhancedSwaggerGenOData(odataSetupAction);
 
             // Wire query option settings into the OData generator options.
-            services.Configure<SwaggerGenODataOptions>(options =>
-            {
-                options.SwaggerGeneratorODataOptions.QueryOptionsSettings = resolvedQueryOptionsSettings;
-            });
+            services.Configure<SwaggerGenODataOptions>(options => options.SwaggerGeneratorODataOptions.QueryOptionsSettings = resolvedQueryOptionsSettings);
 
             // Add OData query options document filter through SwaggerGen
-            services.AddSwaggerGen(swaggerOptions =>
-            {
-                swaggerOptions.DocumentFilter<ODataQueryOptionsDocumentFilter>(resolvedQueryOptionsSettings);
-            });
+            services.AddSwaggerGen(swaggerOptions => swaggerOptions.DocumentFilter<ODataQueryOptionsDocumentFilter>(resolvedQueryOptionsSettings));
 
             return services;
         }
@@ -108,7 +102,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection
         /// <returns>The service collection.</returns>
         public static IServiceCollection AddODataSwaggerGen(
             this IServiceCollection services,
-            Action<SwaggerGenOptions> configureSwaggerGen = null)
+            Action<SwaggerGenOptions>? configureSwaggerGen = null)
         {
             services.AddSwaggerGen(options =>
             {
@@ -130,7 +124,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection
         /// <returns>The service collection.</returns>
         public static IServiceCollection AddSwaggerGenForOData(
             this IServiceCollection services,
-            Action<ODataSwaggerGenOptions> configureOptions = null)
+            Action<ODataSwaggerGenOptions>? configureOptions = null)
         {
             var options = new ODataSwaggerGenOptions();
             configureOptions?.Invoke(options);
@@ -144,10 +138,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection
                 }
             });
 
-            services.Configure<SwaggerGenODataOptions>(swaggerOptions =>
-            {
-                swaggerOptions.SwaggerGeneratorODataOptions.QueryOptionsSettings = options.QueryOptionsSettings;
-            });
+            services.Configure<SwaggerGenODataOptions>(swaggerOptions => swaggerOptions.SwaggerGeneratorODataOptions.QueryOptionsSettings = options.QueryOptionsSettings);
 
             // Add SwaggerGen with OData filters
             services.AddSwaggerGen(swaggerOptions =>
@@ -171,7 +162,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection
         /// <summary>
         /// Swagger documents to generate.
         /// </summary>
-        internal Dictionary<string, (string Route, OpenApiInfo Info)> SwaggerDocs { get; } = new();
+        internal Dictionary<string, (string Route, OpenApiInfo Info)> SwaggerDocs { get; } = [];
 
         /// <summary>
         /// Settings for OData query options.
@@ -181,7 +172,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection
         /// <summary>
         /// Additional SwaggerGen configuration.
         /// </summary>
-        public Action<SwaggerGenOptions> ConfigureSwaggerGen { get; set; }
+        public Action<SwaggerGenOptions>? ConfigureSwaggerGen { get; set; }
 
         /// <summary>
         /// Adds a Swagger document for an OData route.
@@ -192,7 +183,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection
         /// <returns>This options instance.</returns>
         public ODataSwaggerGenOptions AddDocument(string name, string odataRoute, OpenApiInfo info)
         {
-            SwaggerDocs[name] = (odataRoute, info);
+            this.SwaggerDocs[name] = (odataRoute, info);
             return this;
         }
     }
