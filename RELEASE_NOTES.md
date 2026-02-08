@@ -12,6 +12,7 @@ The format is inspired by Keep a Changelog and uses semantic versioning.
 
 - Standardized MinVer configuration so package versions are derived consistently from git tags.
 - Clarified maintainer release workflow for tag-driven versioning in `DEVGUIDE.md`.
+- Switched NuGet publishing workflow from long-lived API key auth to nuget.org Trusted Publisher (OIDC via `NuGet/login@v1`).
 
 ### Fixed
 

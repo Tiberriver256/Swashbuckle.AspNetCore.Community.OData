@@ -59,6 +59,15 @@ dotnet-outdated Examples/ValidationHarness/ValidationHarness.csproj
 5. Publish GitHub release from the tag.
 6. Verify NuGet package version and published release notes match the tag.
 
+### NuGet trusted publishing prerequisites
+
+- Configure a nuget.org Trusted Publisher policy for this repository:
+  - Repository owner: `Tiberriver256`
+  - Repository: `Swashbuckle.AspNetCore.Community.OData`
+  - Workflow file: `build.yml`
+  - Environment: `NuGet`
+- Add repository/environment secret `NUGET_USER` with the nuget.org profile name used for publishing.
+
 ## CI model summary
 
 - Build workflow runs on push, PR, release, and manual dispatch.
