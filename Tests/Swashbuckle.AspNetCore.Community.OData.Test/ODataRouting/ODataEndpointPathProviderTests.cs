@@ -8,7 +8,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.OData.Routing.Template;
@@ -42,7 +41,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.ODataRouting
             var paths = provider.GetPaths(model, settings);
 
             // Assert
-            paths.Should().BeEmpty();
+            Assert.IsFalse(paths.Any());
         }
 
         [TestMethod]
@@ -59,9 +58,9 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.ODataRouting
             var paths = provider.GetPaths(model, settings).ToList();
 
             // Assert
-            paths.Should().NotBeEmpty();
-            paths.Should().Contain(p => p.PathTemplate == "/Products");
-            paths.Should().Contain(p => p.PathTemplate == "/Products({key})");
+            Assert.IsTrue(paths.Any());
+            Assert.IsTrue(paths.Any(p => p.PathTemplate == "/Products"));
+            Assert.IsTrue(paths.Any(p => p.PathTemplate == "/Products({key})"));
         }
 
         [TestMethod]
@@ -82,8 +81,8 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.ODataRouting
             var paths = provider.GetPaths(model, settings).ToList();
 
             // Assert
-            paths.Should().HaveCount(1);
-            paths.Should().OnlyContain(p => p.PathTemplate == "/Products");
+            Assert.AreEqual(1, paths.Count);
+            Assert.IsTrue(paths.All(p => p.PathTemplate == "/Products"));
         }
 
         [TestMethod]
@@ -104,9 +103,9 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.ODataRouting
             var paths = provider.GetPaths(model, settings).ToList();
 
             // Assert
-            var productPath = paths.Should().ContainSingle(p => p.PathTemplate == "/Products").Subject;
-            productPath.HttpMethods.Should().Contain("GET");
-            productPath.HttpMethods.Should().Contain("POST");
+            var productPath = paths.Single(p => p.PathTemplate == "/Products");
+            Assert.IsTrue(productPath.HttpMethods.Contains("GET"));
+            Assert.IsTrue(productPath.HttpMethods.Contains("POST"));
         }
 
         [TestMethod]
@@ -129,9 +128,12 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.ODataRouting
             var paths = provider.GetPaths(model, settings).ToList();
 
             // Assert
-            var singleProductPath = paths.Should().ContainSingle(p => p.PathTemplate.Contains("({key})")).Subject;
-            singleProductPath.HttpMethods.Should().HaveCount(4);
-            singleProductPath.HttpMethods.Should().Contain(new[] { "GET", "PUT", "PATCH", "DELETE" });
+            var singleProductPath = paths.Single(p => p.PathTemplate.Contains("({key})"));
+            Assert.AreEqual(4, singleProductPath.HttpMethods.Count);
+            Assert.IsTrue(singleProductPath.HttpMethods.Contains("GET"));
+            Assert.IsTrue(singleProductPath.HttpMethods.Contains("PUT"));
+            Assert.IsTrue(singleProductPath.HttpMethods.Contains("PATCH"));
+            Assert.IsTrue(singleProductPath.HttpMethods.Contains("DELETE"));
         }
 
         [TestMethod]
@@ -143,8 +145,8 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.ODataRouting
             var provider = new ODataEndpointPathProvider(model, endpointDataSource, "odata");
 
             // Act & Assert
-            provider.CanFilter(null!).Should().BeTrue();
-            provider.CanFilter(model.EntityContainer).Should().BeTrue();
+            Assert.IsTrue(provider.CanFilter(null!));
+            Assert.IsTrue(provider.CanFilter(model.EntityContainer));
         }
 
         #region Helper Methods

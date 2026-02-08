@@ -7,7 +7,6 @@
 
 using System.Collections.Generic;
 using System.Linq;
-using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.OpenApi.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -37,13 +36,13 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
             var productsPath = document.Paths["/Products"];
             var getOperation = productsPath.Operations[OperationType.Get];
 
-            getOperation.Parameters.Should().Contain(p => p.Name == "$filter");
-            getOperation.Parameters.Should().Contain(p => p.Name == "$select");
-            getOperation.Parameters.Should().Contain(p => p.Name == "$expand");
-            getOperation.Parameters.Should().Contain(p => p.Name == "$orderby");
-            getOperation.Parameters.Should().Contain(p => p.Name == "$top");
-            getOperation.Parameters.Should().Contain(p => p.Name == "$skip");
-            getOperation.Parameters.Should().Contain(p => p.Name == "$count");
+            AssertHasParameter(getOperation, "$filter");
+            AssertHasParameter(getOperation, "$select");
+            AssertHasParameter(getOperation, "$expand");
+            AssertHasParameter(getOperation, "$orderby");
+            AssertHasParameter(getOperation, "$top");
+            AssertHasParameter(getOperation, "$skip");
+            AssertHasParameter(getOperation, "$count");
         }
 
         [TestMethod]
@@ -61,9 +60,9 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
             var singleProductPath = document.Paths["/Products({key})"];
             var getOperation = singleProductPath.Operations[OperationType.Get];
 
-            getOperation.Parameters.Should().NotContain(p => p.Name == "$filter");
-            getOperation.Parameters.Should().NotContain(p => p.Name == "$top");
-            getOperation.Parameters.Should().NotContain(p => p.Name == "$skip");
+            AssertDoesNotHaveParameter(getOperation, "$filter");
+            AssertDoesNotHaveParameter(getOperation, "$top");
+            AssertDoesNotHaveParameter(getOperation, "$skip");
         }
 
         [TestMethod]
@@ -87,9 +86,9 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
             var productsPath = document.Paths["/Products"];
             var getOperation = productsPath.Operations[OperationType.Get];
 
-            getOperation.Parameters.Should().NotContain(p => p.Name == "$filter");
-            getOperation.Parameters.Should().NotContain(p => p.Name == "$select");
-            getOperation.Parameters.Should().NotContain(p => p.Name == "$expand");
+            AssertDoesNotHaveParameter(getOperation, "$filter");
+            AssertDoesNotHaveParameter(getOperation, "$select");
+            AssertDoesNotHaveParameter(getOperation, "$expand");
         }
 
         [TestMethod]
@@ -107,17 +106,17 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
             var productsPath = document.Paths["/Products"];
             var getOperation = productsPath.Operations[OperationType.Get];
 
-            var topParam = getOperation.Parameters.Should().ContainSingle(p => p.Name == "$top").Subject;
-            topParam.Schema.Type.Should().Be("integer");
-            topParam.Schema.Format.Should().Be("int32");
-            topParam.Schema.Maximum.Should().Be(100);
+            var topParam = GetSingleParameter(getOperation, "$top");
+            Assert.AreEqual("integer", topParam.Schema.Type);
+            Assert.AreEqual("int32", topParam.Schema.Format);
+            Assert.AreEqual(100m, topParam.Schema.Maximum);
 
-            var countParam = getOperation.Parameters.Should().ContainSingle(p => p.Name == "$count").Subject;
-            countParam.Schema.Type.Should().Be("boolean");
+            var countParam = GetSingleParameter(getOperation, "$count");
+            Assert.AreEqual("boolean", countParam.Schema.Type);
 
-            var filterParam = getOperation.Parameters.Should().ContainSingle(p => p.Name == "$filter").Subject;
-            filterParam.Schema.Type.Should().Be("string");
-            filterParam.In.Should().Be(ParameterLocation.Query);
+            var filterParam = GetSingleParameter(getOperation, "$filter");
+            Assert.AreEqual("string", filterParam.Schema.Type);
+            Assert.AreEqual(ParameterLocation.Query, filterParam.In);
         }
 
         [TestMethod]
@@ -141,11 +140,11 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
             var productsPath = document.Paths["/Products"];
             var getOperation = productsPath.Operations[OperationType.Get];
 
-            var filterParam = getOperation.Parameters.Should().ContainSingle(p => p.Name == "$filter").Subject;
-            filterParam.Example.Should().NotBeNull();
+            var filterParam = GetSingleParameter(getOperation, "$filter");
+            Assert.IsNotNull(filterParam.Example);
 
-            var selectParam = getOperation.Parameters.Should().ContainSingle(p => p.Name == "$select").Subject;
-            selectParam.Example.Should().NotBeNull();
+            var selectParam = GetSingleParameter(getOperation, "$select");
+            Assert.IsNotNull(selectParam.Example);
         }
 
         [TestMethod]
@@ -171,7 +170,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
             filter.Apply(document, context);
 
             // Assert
-            getOperation.Parameters.Where(p => p.Name == "$filter").Should().HaveCount(1);
+            Assert.AreEqual(1, getOperation.Parameters.Count(p => p.Name == "$filter"));
         }
 
         [TestMethod]
@@ -193,7 +192,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
             var productsPath = document.Paths["/Products"];
             var getOperation = productsPath.Operations[OperationType.Get];
 
-            getOperation.Parameters.Should().Contain(p => p.Name == "$search");
+            AssertHasParameter(getOperation, "$search");
         }
 
         [TestMethod]
@@ -215,8 +214,9 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
             var productsPath = document.Paths["/Products"];
             var getOperation = productsPath.Operations[OperationType.Get];
 
-            var formatParam = getOperation.Parameters.Should().ContainSingle(p => p.Name == "$format").Subject;
-            formatParam.Schema.Enum.Should().NotBeNullOrEmpty();
+            var formatParam = GetSingleParameter(getOperation, "$format");
+            Assert.IsNotNull(formatParam.Schema.Enum);
+            Assert.IsTrue(formatParam.Schema.Enum.Count > 0);
         }
 
         [TestMethod]
@@ -241,7 +241,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
 
             // Assert - POST should not have query parameters
             var postOperation = productsPath.Operations[OperationType.Post];
-            postOperation.Parameters.Should().NotContain(p => p.Name.StartsWith("$"));
+            Assert.IsFalse(postOperation.Parameters.Any(p => p.Name.StartsWith('$')));
         }
 
         [TestMethod]
@@ -251,18 +251,18 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
             var settings = new ODataQueryOptionsSettings();
 
             // Assert
-            settings.EnableFilter.Should().BeTrue();
-            settings.EnableSelect.Should().BeTrue();
-            settings.EnableExpand.Should().BeTrue();
-            settings.EnableOrderBy.Should().BeTrue();
-            settings.EnableTop.Should().BeTrue();
-            settings.EnableSkip.Should().BeTrue();
-            settings.EnableCount.Should().BeTrue();
-            settings.EnableSearch.Should().BeFalse();
-            settings.EnableFormat.Should().BeTrue();
-            settings.EnablePagination.Should().BeTrue();
-            settings.MaxTop.Should().Be(100);
-            settings.DefaultTop.Should().Be(50);
+            Assert.IsTrue(settings.EnableFilter);
+            Assert.IsTrue(settings.EnableSelect);
+            Assert.IsTrue(settings.EnableExpand);
+            Assert.IsTrue(settings.EnableOrderBy);
+            Assert.IsTrue(settings.EnableTop);
+            Assert.IsTrue(settings.EnableSkip);
+            Assert.IsTrue(settings.EnableCount);
+            Assert.IsFalse(settings.EnableSearch);
+            Assert.IsTrue(settings.EnableFormat);
+            Assert.IsTrue(settings.EnablePagination);
+            Assert.AreEqual(100, settings.MaxTop);
+            Assert.AreEqual(50, settings.DefaultTop);
         }
 
         #region Helper Methods
@@ -320,6 +320,23 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
                     }
                 }
             };
+        }
+
+        private static void AssertHasParameter(OpenApiOperation operation, string parameterName)
+        {
+            Assert.IsTrue(operation.Parameters.Any(p => p.Name == parameterName), $"Expected parameter '{parameterName}' to be present.");
+        }
+
+        private static void AssertDoesNotHaveParameter(OpenApiOperation operation, string parameterName)
+        {
+            Assert.IsFalse(operation.Parameters.Any(p => p.Name == parameterName), $"Expected parameter '{parameterName}' to be absent.");
+        }
+
+        private static OpenApiParameter GetSingleParameter(OpenApiOperation operation, string parameterName)
+        {
+            var matches = operation.Parameters.Where(p => p.Name == parameterName).ToList();
+            Assert.AreEqual(1, matches.Count, $"Expected exactly one '{parameterName}' parameter.");
+            return matches[0];
         }
 
         #endregion

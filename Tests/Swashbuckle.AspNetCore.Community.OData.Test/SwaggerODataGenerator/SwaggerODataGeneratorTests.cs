@@ -1,4 +1,3 @@
-using FluentAssertions;
 using Microsoft.Extensions.Options;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
@@ -29,10 +28,10 @@ namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection.Tests
             var document = subject.GetSwagger("v1");
 
             // Assert
-            document.Info.Version.Should().Be("V1");
-            document.Info.Title.Should().Be("Test API");
-            document.Paths.Keys.Should().Contain("/People");
-            document.Paths.Keys.Should().Contain("/People({Id})");
+            Assert.AreEqual("V1", document.Info.Version);
+            Assert.AreEqual("Test API", document.Info.Title);
+            Assert.IsTrue(document.Paths.Keys.Contains("/People"));
+            Assert.IsTrue(document.Paths.Keys.Contains("/People({Id})"));
         }
 
         private static IEdmModel GetFakeEdmModel()
