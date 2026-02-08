@@ -23,7 +23,7 @@ If animation is not shown in your Markdown viewer, open [`Images/swagger-ui-demo
 
 ## ✨ Features
 
-- 🔍 **Full OData Query Support** - Automatic documentation of `$filter`, `$select`, `$expand`, `$orderby`, `$top`, `$skip`, `$count`, `$search`
+- 🔍 **Full OData Query Support** - Automatic documentation of `$filter`, `$select`, `$expand`, `$orderby`, `$top`, `$skip`, `$count`, `$format` (and `$search` when enabled)
 - 📡 **Real Endpoint-Based Generation** - Uses actual ASP.NET Core endpoint routing for accurate API documentation
 - 🎯 **Complete OData Path Coverage** - Entity sets, singletons, functions, actions, property access, `$value`, `$ref`
 - 🚀 **HTTP Method Accuracy** - Correctly captures GET, POST, PUT, PATCH, DELETE with proper request/response schemas
@@ -76,8 +76,6 @@ public void ConfigureServices(IServiceCollection services)
         }
     );
 
-    // Add Swashbuckle services
-    services.AddSwaggerGen();
 }
 
 public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -130,8 +128,6 @@ builder.Services.AddEnhancedSwaggerGenODataWithQueryOptions(
             Version = "v1"
         });
     });
-
-builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 app.UseSwagger();
