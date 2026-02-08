@@ -5,6 +5,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
+    <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Source\Swashbuckle.AspNetCore.Community.OData\Swashbuckle.AspNetCore.Community.OData.csproj" />
+    <ProjectReference Include="..\..\Source\Swashbuckle.AspNetCore.Community.OData\Swashbuckle.AspNetCore.Community.OData.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,11 +1,11 @@
-# Manual Validation Checklist
+# Validation Harness Checklist
 
 This checklist verifies that the enhanced OData Swagger implementation works correctly.
 
 ## 🚀 Running the Validation API
 
 ```bash
-cd ManualValidation
+cd Examples/ValidationHarness
 dotnet run
 ```
 

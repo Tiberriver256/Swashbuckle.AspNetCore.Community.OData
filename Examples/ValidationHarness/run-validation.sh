@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# Manual Validation Runner for Enhanced OData Swagger
-# This script builds and runs the validation API
+# Validation Harness Runner for Enhanced OData Swagger
+# This script builds and runs the validation harness API
 
 set -e
 
 echo "=========================================="
-echo "Enhanced OData Swagger - Manual Validation"
+echo "Enhanced OData Swagger - Validation Harness"
 echo "=========================================="
 echo ""
 
@@ -19,7 +19,7 @@ NC='\033[0m' # No Color
 # Check if dotnet is installed
 if ! command -v dotnet &> /dev/null; then
     echo -e "${RED}Error: dotnet CLI not found${NC}"
-    echo "Please install .NET SDK 8.0 or later"
+    echo "Please install .NET SDK 10.0 or later"
     exit 1
 fi
 

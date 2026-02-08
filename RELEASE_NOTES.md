@@ -19,6 +19,8 @@ The format is inspired by Keep a Changelog and uses semantic versioning.
 ### Changed
 
 - Upgraded to modern OpenAPI + Swashbuckle stack and migrated API usage to current OpenAPI model.
+- Made enhanced OData Swagger registration the default path and marked `AddSwaggerGenOData` legacy API as obsolete compatibility shim.
+- Moved manual validation app into samples as `Examples/ValidationHarness`.
 - Aligned OData package versions for dependency compatibility.
 - Migrated test stack to MSTest + Microsoft.Testing.Platform and enabled analyzers.
 - Removed FluentAssertions from tests.

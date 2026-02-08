@@ -1,6 +1,6 @@
-# Manual Validation Report (Template)
+# Validation Harness Report (Template)
 
-> Copy this template into `ManualValidation/reports/` for each PR/release validation run.
+> Copy this template into `Examples/ValidationHarness/reports/` for each PR/release validation run.
 
 **Date:** YYYY-MM-DD  
 **Branch:** <branch-name>  

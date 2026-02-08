@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace ManualValidation;
+namespace ValidationHarness;
 
 /// <summary>
 /// Entity Framework database context for validation testing.

@@ -13,8 +13,8 @@ Comprehensive reference for integrating OData OpenAPI generation with Swashbuckl
 - [Installation](#installation)
 - [Getting started](#getting-started)
 - [Dependency injection API](#dependency-injection-api)
-  - [Enhanced API (recommended)](#enhanced-api-recommended)
-  - [Legacy API](#legacy-api)
+  - [Enhanced API (default)](#enhanced-api-default)
+  - [Legacy compatibility API](#legacy-compatibility-api)
 - [Configuration options](#configuration-options)
   - [SwaggerGenODataOptions](#swaggergenodataoptions)
   - [SwaggerODataGeneratorOptions](#swaggerodatageneratoroptions)
@@ -29,12 +29,11 @@ Comprehensive reference for integrating OData OpenAPI generation with Swashbuckl
 
 `Swashbuckle.AspNetCore.Community.OData` provides OData-aware OpenAPI generation on top of Swashbuckle.
 
-It supports two generation modes:
-
-1. **Enhanced endpoint-aware generation** (recommended)
-2. **Legacy EDM conversion generation**
+The package defaults to **enhanced endpoint-aware generation**.
 
 The enhanced mode uses ASP.NET Core endpoint metadata and augments the generated OpenAPI document with richer OData behavior (query options, path coverage, method mapping).
+
+A legacy registration API is still available as a compatibility shim, but it now routes through the enhanced generator and is marked obsolete.
 
 ## Package goals
 
@@ -131,7 +130,7 @@ public class Product
 
 Namespace: `Swashbuckle.AspNetCore.Community.OData.DependencyInjection`
 
-### Enhanced API (recommended)
+### Enhanced API (default)
 
 #### `AddEnhancedSwaggerGenOData`
 
@@ -174,11 +173,11 @@ services.AddSwaggerGenForOData(options =>
 
 Adds OData document filter behavior via standard `AddSwaggerGen` pipeline.
 
-### Legacy API
+### Legacy compatibility API
 
 #### `AddSwaggerGenOData`
 
-Legacy provider registration path.
+Legacy compatibility shim. This API is marked obsolete and forwards to the enhanced generator pipeline.
 
 ```csharp
 services.AddSwaggerGenOData(options =>
@@ -188,6 +187,8 @@ services.AddSwaggerGenOData(options =>
 ```
 
 `SwaggerGenODataOptionsExtensions.SwaggerDoc(...)` is used to register named docs and OData route mappings.
+
+Plan migration to `AddEnhancedSwaggerGenOData(...)` or `AddEnhancedSwaggerGenODataWithQueryOptions(...)` because the legacy shim is scheduled for removal in the next major after v2.
 
 ## Configuration options
 
@@ -248,10 +249,10 @@ dotnet test --project Tests/Swashbuckle.AspNetCore.Community.OData.Test/Swashbuc
 dotnet cake --target=Default
 ```
 
-Manual validation resources:
+Validation harness resources:
 
-- `ManualValidation/VALIDATION_CHECKLIST.md`
-- `ManualValidation/VALIDATION_REPORT.md`
+- `Examples/ValidationHarness/VALIDATION_CHECKLIST.md`
+- `Examples/ValidationHarness/VALIDATION_REPORT.md`
 
 ## Troubleshooting
 
@@ -280,6 +281,8 @@ Manual validation resources:
 1. Replace `AddSwaggerGenOData(...)` with `AddEnhancedSwaggerGenOData(...)`.
 2. If query options should be documented globally, use `AddEnhancedSwaggerGenODataWithQueryOptions(...)`.
 3. Re-validate generated OpenAPI for route names, method coverage, and parameter shape.
+
+> `AddSwaggerGenOData(...)` currently forwards to the enhanced pipeline, but is obsolete and intended only for temporary compatibility.
 
 ### From older OpenAPI.NET / Swashbuckle APIs
 

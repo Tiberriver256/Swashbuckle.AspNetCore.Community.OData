@@ -12,6 +12,8 @@ Provides full support for OData query options ($filter, $select, $expand, etc.),
 
 > [!TIP]
 > Start with [DOCUMENTATION.md](./DOCUMENTATION.md) for the canonical reference and [RELEASE_NOTES.md](./RELEASE_NOTES.md) for change history and breaking changes.
+>
+> `AddEnhancedSwaggerGenOData*` is the default API path. `AddSwaggerGenOData` remains only as an obsolete compatibility shim.
 
 ## ✨ Features
 
@@ -252,7 +254,8 @@ services.AddSwaggerGen(options =>
 - [RELEASE_NOTES.md](./RELEASE_NOTES.md) - Release and breaking-change history
 - [DEVGUIDE.md](./DEVGUIDE.md) - Maintainer release/build workflow
 - [MAINTAINERS.md](./MAINTAINERS.md) - Maintainer list
-- [Examples/SimpleOdataApi](./Examples/SimpleOdataApi) - Sample implementation
+- [Examples/SimpleOdataApi](./Examples/SimpleOdataApi) - Lightweight sample implementation
+- [Examples/ValidationHarness](./Examples/ValidationHarness) - Validation-focused sample with richer OData surface area
 - [OData to OpenAPI Mapping](https://www.oasis-open.org/committees/document.php?document_id=61852&wg_abbrev=odata) - Official OData OpenAPI specification
 
 ## 🏗️ Building from Source

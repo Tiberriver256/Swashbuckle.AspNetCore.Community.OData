@@ -6,6 +6,8 @@ Maintainer guide for building, validating, documenting, and releasing `Swashbuck
 
 - Keep the package lean and focused on OData + Swashbuckle integration.
 - Keep docs, tests, and release notes in sync with code changes.
+- Treat the enhanced generator as the default API surface.
+- Keep legacy APIs only as compatibility shims during migration windows.
 - Do not ship with failing CI or known dependency incompatibilities.
 
 ## Local validation checklist
@@ -18,10 +20,10 @@ dotnet test --project Tests/Swashbuckle.AspNetCore.Community.OData.Test/Swashbuc
 dotnet cake --target=Default
 ```
 
-Optional manual validation:
+Optional sample validation harness:
 
-- `ManualValidation/VALIDATION_CHECKLIST.md`
-- `ManualValidation/VALIDATION_REPORT.md`
+- `Examples/ValidationHarness/VALIDATION_CHECKLIST.md`
+- `Examples/ValidationHarness/VALIDATION_REPORT.md`
 
 ## Documentation policy
 
@@ -42,7 +44,7 @@ Recommended checks:
 
 ```bash
 dotnet-outdated Swashbuckle.AspNetCore.Community.OData.sln
-dotnet-outdated ManualValidation/ManualValidation.csproj
+dotnet-outdated Examples/ValidationHarness/ValidationHarness.csproj
 ```
 
 ## Release process

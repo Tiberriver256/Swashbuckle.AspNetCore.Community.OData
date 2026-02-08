@@ -1,9 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Formatter;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Results;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 
-namespace ManualValidation.Controllers;
+namespace ValidationHarness.Controllers;
 
 /// <summary>
 /// Customers OData controller for v2 API testing.

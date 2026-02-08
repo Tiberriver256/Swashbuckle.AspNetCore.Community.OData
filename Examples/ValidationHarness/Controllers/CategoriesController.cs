@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
+using Microsoft.AspNetCore.OData.Results;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 
-namespace ManualValidation.Controllers;
+namespace ValidationHarness.Controllers;
 
 /// <summary>
 /// Categories OData controller for testing navigation properties and $expand.

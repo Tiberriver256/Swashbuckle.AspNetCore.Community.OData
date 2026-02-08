@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.OData.Query;
 using Microsoft.AspNetCore.OData.Results;
 using Microsoft.AspNetCore.OData.Routing.Controllers;
 
-namespace ManualValidation.Controllers;
+namespace ValidationHarness.Controllers;
 
 /// <summary>
 /// Products OData controller demonstrating all CRUD operations,

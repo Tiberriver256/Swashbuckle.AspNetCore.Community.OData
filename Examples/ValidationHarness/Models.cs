@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace ManualValidation;
+namespace ValidationHarness;
 
 /// <summary>
 /// Product entity for OData validation testing.

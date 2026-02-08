@@ -1,6 +1,7 @@
-using ManualValidation;
+using ValidationHarness;
 using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.Community.OData.DependencyInjection;
@@ -35,12 +36,7 @@ builder.Services.AddEnhancedSwaggerGenODataWithQueryOptions(
             {
                 Title = "OData Validation API (v1)",
                 Version = "v1",
-                Description = "Full OData query support: $filter, $select, $expand, $orderby, $top, $skip, $count, $search",
-                Contact = new OpenApiContact
-                {
-                    Name = "Validation Test",
-                    Email = "test@example.com"
-                }
+                Description = "Full OData query support: $filter, $select, $expand, $orderby, $top, $skip, $count, $search"
             }
         );
 
@@ -92,7 +88,7 @@ builder.Services.AddSwaggerGen(c =>
     });
 
     // Enable XML comments
-    var xmlFile = Path.Combine(AppContext.BaseDirectory, "ManualValidation.xml");
+    var xmlFile = Path.Combine(AppContext.BaseDirectory, "ValidationHarness.xml");
     if (File.Exists(xmlFile))
     {
         c.IncludeXmlComments(xmlFile);
@@ -134,11 +130,7 @@ app.UseSwaggerUI(c =>
     c.EnableFilter();
 });
 
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapControllers();
-});
-
+app.MapControllers();
 app.Run();
 
 // ==========================================
@@ -149,16 +141,9 @@ static IEdmModel GetEdmModel()
 {
     var builder = new ODataConventionModelBuilder();
 
-    // Product entity with query restrictions
+    // Product entity
     var product = builder.EntityType<Product>();
     product.HasKey(p => p.Id);
-    product.HasFilterRestrictions()
-        .IsFilterable(true)
-        .IsNonFilterableProperty("SecretCode")
-        .HasDescription("Most properties filterable except SecretCode");
-    product.HasExpandRestrictions()
-        .IsExpandable(true)
-        .HasDescription("Category and Supplier expandable");
     product.Property(p => p.Price).Order = 1;
     product.Property(p => p.Name).Order = 2;
 
@@ -167,10 +152,6 @@ static IEdmModel GetEdmModel()
     // Category entity
     var category = builder.EntityType<Category>();
     category.HasKey(c => c.Id);
-    category.HasNavigationPropertyLink(
-        category.FindNavigation("Products")!,
-        NavigationPropertyLinkType.Association,
-        null);
 
     builder.EntitySet<Category>("Categories");
 
