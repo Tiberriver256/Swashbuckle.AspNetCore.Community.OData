@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi;
 using Microsoft.OpenApi.OData;
@@ -17,7 +18,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection
     /// </remarks>
     /// <param name="options">The options configured during startup.</param>
     public class SwaggerODataGenerator(IOptions<SwaggerODataGeneratorOptions> options)
-        : ISwaggerProvider
+        : ISwaggerProvider, IAsyncSwaggerProvider
     {
         /// <summary>
         /// Options for the swagger generator.
@@ -54,6 +55,13 @@ namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection
 
             return document;
         }
+
+        /// <inheritdoc/>
+        public Task<OpenApiDocument> GetSwaggerAsync(
+            string documentName,
+            string? host = null,
+            string? basePath = null
+        ) => Task.FromResult(this.GetSwagger(documentName, host, basePath));
 
         private sealed class UnknownODataEdm(
             string documentName,
