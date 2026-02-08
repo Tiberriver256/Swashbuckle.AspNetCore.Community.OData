@@ -10,7 +10,7 @@
     <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="6.9.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.1.2" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Source\Swashbuckle.AspNetCore.Community.OData\Swashbuckle.AspNetCore.Community.OData.csproj" />

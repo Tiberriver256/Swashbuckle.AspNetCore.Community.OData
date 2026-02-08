@@ -9,12 +9,14 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Net.Http;
+using System.Text.Json.Nodes;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.OData.Edm;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Microsoft.OpenApi.OData;
 using Swashbuckle.AspNetCore.Community.OData.DependencyInjection;
 using Swashbuckle.AspNetCore.Community.OData.ODataRouting;
@@ -214,9 +216,8 @@ namespace Swashbuckle.AspNetCore.Community.OData.SwaggerODataGenerator
                 var pathItem = document.Paths[pathTemplate];
 
                 var operationTypes = GetHttpMethods(endpoint)
-                    .Select(ParseOperationType)
-                    .Where(operationType => operationType.HasValue)
-                    .Select(operationType => operationType!.Value);
+                    .Select(ParseHttpMethod)
+                    .Where(httpMethod => httpMethod != null);
 
                 foreach (var operationType in operationTypes)
                 {
@@ -247,7 +248,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.SwaggerODataGenerator
             foreach (var path in document.Paths)
             {
                 // Only add to collection endpoints (not single entity by key)
-                if (IsCollectionEndpoint(path.Key) && path.Value.Operations.TryGetValue(OperationType.Get, out var getOperation))
+                if (IsCollectionEndpoint(path.Key) && path.Value.Operations.TryGetValue(HttpMethod.Get, out var getOperation))
                 {
                     AddQueryParametersToOperation(getOperation);
                 }
@@ -329,9 +330,8 @@ namespace Swashbuckle.AspNetCore.Community.OData.SwaggerODataGenerator
                 var pathItem = new OpenApiPathItem();
                 
                 // GET for property value
-                pathItem.Operations[OperationType.Get] = new OpenApiOperation
+                pathItem.Operations[HttpMethod.Get] = new OpenApiOperation
                 {
-                    Tags = new List<OpenApiTag> { new OpenApiTag { Name = entityType.Name } },
                     Summary = $"Get {property.Name} property value",
                     OperationId = $"Get{entityType.Name}{property.Name}",
                     Responses = new OpenApiResponses
@@ -339,7 +339,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.SwaggerODataGenerator
                         ["200"] = new OpenApiResponse
                         {
                             Description = "Success",
-                            Content = new Dictionary<string, OpenApiMediaType>
+                            Content = new Dictionary<string, IOpenApiMediaType>
                             {
                                 ["application/json"] = new OpenApiMediaType
                                 {
@@ -357,10 +357,9 @@ namespace Swashbuckle.AspNetCore.Community.OData.SwaggerODataGenerator
                 if (!paths.ContainsKey(valuePath))
                 {
                     var valuePathItem = new OpenApiPathItem();
-                    valuePathItem.Operations[OperationType.Get] = new OpenApiOperation
+                    valuePathItem.Operations[HttpMethod.Get] = new OpenApiOperation
                     {
-                        Tags = new List<OpenApiTag> { new OpenApiTag { Name = entityType.Name } },
-                        Summary = $"Get raw {property.Name} value",
+                            Summary = $"Get raw {property.Name} value",
                         OperationId = $"Get{entityType.Name}{property.Name}Value",
                         Responses = new OpenApiResponses
                         {
@@ -387,7 +386,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.SwaggerODataGenerator
             }
 
             var pathItem = new OpenApiPathItem();
-            pathItem.Operations[OperationType.Get] = new OpenApiOperation
+            pathItem.Operations[HttpMethod.Get] = new OpenApiOperation
             {
                 Summary = "Get raw entity value",
                 Responses = new OpenApiResponses
@@ -415,9 +414,8 @@ namespace Swashbuckle.AspNetCore.Community.OData.SwaggerODataGenerator
                 var pathItem = new OpenApiPathItem();
 
                 // GET $ref
-                pathItem.Operations[OperationType.Get] = new OpenApiOperation
+                pathItem.Operations[HttpMethod.Get] = new OpenApiOperation
                 {
-                    Tags = new List<OpenApiTag> { new OpenApiTag { Name = entityType.Name } },
                     Summary = $"Get {navProperty.Name} reference",
                     Responses = new OpenApiResponses
                     {
@@ -429,9 +427,8 @@ namespace Swashbuckle.AspNetCore.Community.OData.SwaggerODataGenerator
                 };
 
                 // PUT $ref (update reference)
-                pathItem.Operations[OperationType.Put] = new OpenApiOperation
+                pathItem.Operations[HttpMethod.Put] = new OpenApiOperation
                 {
-                    Tags = new List<OpenApiTag> { new OpenApiTag { Name = entityType.Name } },
                     Summary = $"Update {navProperty.Name} reference",
                     Responses = new OpenApiResponses
                     {
@@ -440,9 +437,8 @@ namespace Swashbuckle.AspNetCore.Community.OData.SwaggerODataGenerator
                 };
 
                 // DELETE $ref (remove reference)
-                pathItem.Operations[OperationType.Delete] = new OpenApiOperation
+                pathItem.Operations[HttpMethod.Delete] = new OpenApiOperation
                 {
-                    Tags = new List<OpenApiTag> { new OpenApiTag { Name = entityType.Name } },
                     Summary = $"Delete {navProperty.Name} reference",
                     Responses = new OpenApiResponses
                     {
@@ -474,7 +470,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.SwaggerODataGenerator
 
                 return new OpenApiSchema
                 {
-                    Type = "array",
+                    Type = JsonSchemaType.Array,
                     Items = CreateSchemaForEdmType(elementType)
                 };
             }
@@ -489,32 +485,32 @@ namespace Swashbuckle.AspNetCore.Community.OData.SwaggerODataGenerator
         /// <summary>
         /// Converts EDM type to OpenAPI type.
         /// </summary>
-        private string ConvertEdmTypeToOpenApiType(IEdmTypeReference edmType)
+        private JsonSchemaType ConvertEdmTypeToOpenApiType(IEdmTypeReference edmType)
         {
             if (edmType.IsCollection())
             {
-                return "array";
+                return JsonSchemaType.Array;
             }
 
             return edmType.PrimitiveKind() switch
             {
-                EdmPrimitiveTypeKind.Boolean => "boolean",
-                EdmPrimitiveTypeKind.Byte => "integer",
-                EdmPrimitiveTypeKind.SByte => "integer",
-                EdmPrimitiveTypeKind.Int16 => "integer",
-                EdmPrimitiveTypeKind.Int32 => "integer",
-                EdmPrimitiveTypeKind.Int64 => "integer",
-                EdmPrimitiveTypeKind.Single => "number",
-                EdmPrimitiveTypeKind.Double => "number",
-                EdmPrimitiveTypeKind.Decimal => "number",
-                EdmPrimitiveTypeKind.String => "string",
-                EdmPrimitiveTypeKind.Date => "string",
-                EdmPrimitiveTypeKind.DateTimeOffset => "string",
-                EdmPrimitiveTypeKind.TimeOfDay => "string",
-                EdmPrimitiveTypeKind.Duration => "string",
-                EdmPrimitiveTypeKind.Guid => "string",
-                EdmPrimitiveTypeKind.Binary => "string",
-                _ => "object"
+                EdmPrimitiveTypeKind.Boolean => JsonSchemaType.Boolean,
+                EdmPrimitiveTypeKind.Byte => JsonSchemaType.Integer,
+                EdmPrimitiveTypeKind.SByte => JsonSchemaType.Integer,
+                EdmPrimitiveTypeKind.Int16 => JsonSchemaType.Integer,
+                EdmPrimitiveTypeKind.Int32 => JsonSchemaType.Integer,
+                EdmPrimitiveTypeKind.Int64 => JsonSchemaType.Integer,
+                EdmPrimitiveTypeKind.Single => JsonSchemaType.Number,
+                EdmPrimitiveTypeKind.Double => JsonSchemaType.Number,
+                EdmPrimitiveTypeKind.Decimal => JsonSchemaType.Number,
+                EdmPrimitiveTypeKind.String => JsonSchemaType.String,
+                EdmPrimitiveTypeKind.Date => JsonSchemaType.String,
+                EdmPrimitiveTypeKind.DateTimeOffset => JsonSchemaType.String,
+                EdmPrimitiveTypeKind.TimeOfDay => JsonSchemaType.String,
+                EdmPrimitiveTypeKind.Duration => JsonSchemaType.String,
+                EdmPrimitiveTypeKind.Guid => JsonSchemaType.String,
+                EdmPrimitiveTypeKind.Binary => JsonSchemaType.String,
+                _ => JsonSchemaType.Object
             };
         }
 
@@ -573,48 +569,48 @@ namespace Swashbuckle.AspNetCore.Community.OData.SwaggerODataGenerator
         /// </summary>
         private void AddQueryParametersToOperation(OpenApiOperation operation)
         {
-            operation.Parameters ??= new List<OpenApiParameter>();
+            operation.Parameters ??= new List<IOpenApiParameter>();
 
-            var queryParameters = new List<OpenApiParameter>();
+            var queryParameters = new List<IOpenApiParameter>();
 
             if (_queryOptionsSettings.EnableFilter)
             {
-                queryParameters.Add(CreateQueryParameter("$filter", "Filter results using OData filter expressions", "string", _queryOptionsSettings.FilterExample));
+                queryParameters.Add(CreateQueryParameter("$filter", "Filter results using OData filter expressions", JsonSchemaType.String, _queryOptionsSettings.FilterExample));
             }
 
             if (_queryOptionsSettings.EnableSelect)
             {
-                queryParameters.Add(CreateQueryParameter("$select", "Select specific properties", "string", _queryOptionsSettings.SelectExample));
+                queryParameters.Add(CreateQueryParameter("$select", "Select specific properties", JsonSchemaType.String, _queryOptionsSettings.SelectExample));
             }
 
             if (_queryOptionsSettings.EnableExpand)
             {
-                queryParameters.Add(CreateQueryParameter("$expand", "Expand related entities", "string", _queryOptionsSettings.ExpandExample));
+                queryParameters.Add(CreateQueryParameter("$expand", "Expand related entities", JsonSchemaType.String, _queryOptionsSettings.ExpandExample));
             }
 
             if (_queryOptionsSettings.EnableOrderBy)
             {
-                queryParameters.Add(CreateQueryParameter("$orderby", "Order results by properties", "string", _queryOptionsSettings.OrderByExample));
+                queryParameters.Add(CreateQueryParameter("$orderby", "Order results by properties", JsonSchemaType.String, _queryOptionsSettings.OrderByExample));
             }
 
             if (_queryOptionsSettings.EnableTop)
             {
-                queryParameters.Add(CreateQueryParameter("$top", "Limit number of results", "integer", null, "int32", _queryOptionsSettings.DefaultTop, _queryOptionsSettings.MaxTop));
+                queryParameters.Add(CreateQueryParameter("$top", "Limit number of results", JsonSchemaType.Integer, null, "int32", _queryOptionsSettings.DefaultTop, _queryOptionsSettings.MaxTop));
             }
 
             if (_queryOptionsSettings.EnableSkip)
             {
-                queryParameters.Add(CreateQueryParameter("$skip", "Skip first N results", "integer", null, "int32", 0));
+                queryParameters.Add(CreateQueryParameter("$skip", "Skip first N results", JsonSchemaType.Integer, null, "int32", 0));
             }
 
             if (_queryOptionsSettings.EnableCount)
             {
-                queryParameters.Add(CreateQueryParameter("$count", "Include total count", "boolean", null));
+                queryParameters.Add(CreateQueryParameter("$count", "Include total count", JsonSchemaType.Boolean, null));
             }
 
             if (_queryOptionsSettings.EnableSearch)
             {
-                queryParameters.Add(CreateQueryParameter("$search", "Free-text search", "string", null));
+                queryParameters.Add(CreateQueryParameter("$search", "Free-text search", JsonSchemaType.String, null));
             }
 
             foreach (var parameter in queryParameters.Where(param => !operation.Parameters.Any(existing => existing.Name == param.Name)))
@@ -626,22 +622,22 @@ namespace Swashbuckle.AspNetCore.Community.OData.SwaggerODataGenerator
         /// <summary>
         /// Creates a query parameter.
         /// </summary>
-        private OpenApiParameter CreateQueryParameter(string name, string description, string type, string example, string format = null, object defaultValue = null, decimal? maximum = null)
+        private IOpenApiParameter CreateQueryParameter(string name, string description, JsonSchemaType type, string example, string format = null, object defaultValue = null, decimal? maximum = null)
         {
             var schema = new OpenApiSchema
             {
                 Type = type,
                 Format = format,
-                Maximum = maximum
+                Maximum = maximum?.ToString(CultureInfo.InvariantCulture)
             };
 
             if (defaultValue is int intValue)
             {
-                schema.Default = new Microsoft.OpenApi.Any.OpenApiInteger(intValue);
+                schema.Default = JsonValue.Create(intValue);
             }
             else if (defaultValue is bool boolValue)
             {
-                schema.Default = new Microsoft.OpenApi.Any.OpenApiBoolean(boolValue);
+                schema.Default = JsonValue.Create(boolValue);
             }
 
             return new OpenApiParameter
@@ -651,7 +647,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.SwaggerODataGenerator
                 Description = description,
                 Required = false,
                 Schema = schema,
-                Example = example != null ? new Microsoft.OpenApi.Any.OpenApiString(example) : null
+                Example = example != null ? JsonValue.Create(example) : null
             };
         }
 
@@ -723,17 +719,17 @@ namespace Swashbuckle.AspNetCore.Community.OData.SwaggerODataGenerator
         /// <summary>
         /// Parses operation type.
         /// </summary>
-        private OperationType? ParseOperationType(string method)
+        private static HttpMethod ParseHttpMethod(string method)
         {
             return method.ToUpperInvariant() switch
             {
-                "GET" => OperationType.Get,
-                "POST" => OperationType.Post,
-                "PUT" => OperationType.Put,
-                "PATCH" => OperationType.Patch,
-                "DELETE" => OperationType.Delete,
-                "HEAD" => OperationType.Head,
-                "OPTIONS" => OperationType.Options,
+                "GET" => HttpMethod.Get,
+                "POST" => HttpMethod.Post,
+                "PUT" => HttpMethod.Put,
+                "PATCH" => HttpMethod.Patch,
+                "DELETE" => HttpMethod.Delete,
+                "HEAD" => HttpMethod.Head,
+                "OPTIONS" => HttpMethod.Options,
                 _ => null
             };
         }
@@ -741,11 +737,11 @@ namespace Swashbuckle.AspNetCore.Community.OData.SwaggerODataGenerator
         /// <summary>
         /// Creates default operation.
         /// </summary>
-        private OpenApiOperation CreateDefaultOperation(Endpoint endpoint, OperationType operationType, string path)
+        private static OpenApiOperation CreateDefaultOperation(Endpoint endpoint, HttpMethod operationType, string path)
         {
             return new OpenApiOperation
             {
-                Summary = $"{operationType} operation for {path}",
+                Summary = $"{operationType.Method} operation for {path}",
                 Responses = new OpenApiResponses
                 {
                     ["200"] = new OpenApiResponse { Description = "Success" }

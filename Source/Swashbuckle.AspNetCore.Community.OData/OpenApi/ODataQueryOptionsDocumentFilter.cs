@@ -6,8 +6,11 @@
 //------------------------------------------------------------------------------
 
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using Microsoft.OpenApi.Models;
+using System.Net.Http;
+using System.Text.Json.Nodes;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Swashbuckle.AspNetCore.Community.OData.OpenApi
@@ -34,7 +37,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.OpenApi
         {
             foreach (var path in swaggerDoc.Paths)
             {
-                if (path.Value.Operations.TryGetValue(OperationType.Get, out var getOperation)
+                if (path.Value.Operations.TryGetValue(HttpMethod.Get, out var getOperation)
                     && IsCollectionEndpoint(path.Key))
                 {
                     AddODataQueryParameters(getOperation);
@@ -69,9 +72,9 @@ namespace Swashbuckle.AspNetCore.Community.OData.OpenApi
         /// </summary>
         private void AddODataQueryParameters(OpenApiOperation operation)
         {
-            operation.Parameters ??= new List<OpenApiParameter>();
+            operation.Parameters ??= new List<IOpenApiParameter>();
 
-            var parameters = new List<OpenApiParameter>();
+            var parameters = new List<IOpenApiParameter>();
 
             if (_settings.EnableFilter)
             {
@@ -131,7 +134,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.OpenApi
             }
         }
 
-        private OpenApiParameter CreateFilterParameter()
+        private IOpenApiParameter CreateFilterParameter()
         {
             return new OpenApiParameter
             {
@@ -142,13 +145,13 @@ namespace Swashbuckle.AspNetCore.Community.OData.OpenApi
                 Required = false,
                 Schema = new OpenApiSchema
                 {
-                    Type = "string"
+                    Type = JsonSchemaType.String
                 },
-                Example = _settings.FilterExample != null ? new Microsoft.OpenApi.Any.OpenApiString(_settings.FilterExample) : null
+                Example = _settings.FilterExample != null ? JsonValue.Create(_settings.FilterExample) : null
             };
         }
 
-        private OpenApiParameter CreateSelectParameter()
+        private IOpenApiParameter CreateSelectParameter()
         {
             return new OpenApiParameter
             {
@@ -159,13 +162,13 @@ namespace Swashbuckle.AspNetCore.Community.OData.OpenApi
                 Required = false,
                 Schema = new OpenApiSchema
                 {
-                    Type = "string"
+                    Type = JsonSchemaType.String
                 },
-                Example = _settings.SelectExample != null ? new Microsoft.OpenApi.Any.OpenApiString(_settings.SelectExample) : null
+                Example = _settings.SelectExample != null ? JsonValue.Create(_settings.SelectExample) : null
             };
         }
 
-        private OpenApiParameter CreateExpandParameter()
+        private IOpenApiParameter CreateExpandParameter()
         {
             return new OpenApiParameter
             {
@@ -176,13 +179,13 @@ namespace Swashbuckle.AspNetCore.Community.OData.OpenApi
                 Required = false,
                 Schema = new OpenApiSchema
                 {
-                    Type = "string"
+                    Type = JsonSchemaType.String
                 },
-                Example = _settings.ExpandExample != null ? new Microsoft.OpenApi.Any.OpenApiString(_settings.ExpandExample) : null
+                Example = _settings.ExpandExample != null ? JsonValue.Create(_settings.ExpandExample) : null
             };
         }
 
-        private OpenApiParameter CreateOrderByParameter()
+        private IOpenApiParameter CreateOrderByParameter()
         {
             return new OpenApiParameter
             {
@@ -193,13 +196,13 @@ namespace Swashbuckle.AspNetCore.Community.OData.OpenApi
                 Required = false,
                 Schema = new OpenApiSchema
                 {
-                    Type = "string"
+                    Type = JsonSchemaType.String
                 },
-                Example = _settings.OrderByExample != null ? new Microsoft.OpenApi.Any.OpenApiString(_settings.OrderByExample) : null
+                Example = _settings.OrderByExample != null ? JsonValue.Create(_settings.OrderByExample) : null
             };
         }
 
-        private OpenApiParameter CreateTopParameter()
+        private IOpenApiParameter CreateTopParameter()
         {
             return new OpenApiParameter
             {
@@ -209,15 +212,15 @@ namespace Swashbuckle.AspNetCore.Community.OData.OpenApi
                 Required = false,
                 Schema = new OpenApiSchema
                 {
-                    Type = "integer",
+                    Type = JsonSchemaType.Integer,
                     Format = "int32",
-                    Maximum = _settings.MaxTop
+                    Maximum = _settings.MaxTop.ToString(CultureInfo.InvariantCulture)
                 },
-                Example = new Microsoft.OpenApi.Any.OpenApiInteger(_settings.DefaultTop)
+                Example = JsonValue.Create(_settings.DefaultTop)
             };
         }
 
-        private OpenApiParameter CreateSkipParameter()
+        private IOpenApiParameter CreateSkipParameter()
         {
             return new OpenApiParameter
             {
@@ -227,14 +230,14 @@ namespace Swashbuckle.AspNetCore.Community.OData.OpenApi
                 Required = false,
                 Schema = new OpenApiSchema
                 {
-                    Type = "integer",
+                    Type = JsonSchemaType.Integer,
                     Format = "int32"
                 },
-                Example = new Microsoft.OpenApi.Any.OpenApiInteger(0)
+                Example = JsonValue.Create(0)
             };
         }
 
-        private OpenApiParameter CreateCountParameter()
+        private IOpenApiParameter CreateCountParameter()
         {
             return new OpenApiParameter
             {
@@ -245,13 +248,13 @@ namespace Swashbuckle.AspNetCore.Community.OData.OpenApi
                 Required = false,
                 Schema = new OpenApiSchema
                 {
-                    Type = "boolean"
+                    Type = JsonSchemaType.Boolean
                 },
-                Example = new Microsoft.OpenApi.Any.OpenApiBoolean(false)
+                Example = JsonValue.Create(false)
             };
         }
 
-        private OpenApiParameter CreateSearchParameter()
+        private IOpenApiParameter CreateSearchParameter()
         {
             return new OpenApiParameter
             {
@@ -262,12 +265,12 @@ namespace Swashbuckle.AspNetCore.Community.OData.OpenApi
                 Required = false,
                 Schema = new OpenApiSchema
                 {
-                    Type = "string"
+                    Type = JsonSchemaType.String
                 }
             };
         }
 
-        private OpenApiParameter CreateFormatParameter()
+        private IOpenApiParameter CreateFormatParameter()
         {
             return new OpenApiParameter
             {
@@ -278,19 +281,19 @@ namespace Swashbuckle.AspNetCore.Community.OData.OpenApi
                 Required = false,
                 Schema = new OpenApiSchema
                 {
-                    Type = "string",
-                    Enum = new List<Microsoft.OpenApi.Any.IOpenApiAny>
+                    Type = JsonSchemaType.String,
+                    Enum = new List<JsonNode>
                     {
-                        new Microsoft.OpenApi.Any.OpenApiString("application/json"),
-                        new Microsoft.OpenApi.Any.OpenApiString("application/json;odata.metadata=none"),
-                        new Microsoft.OpenApi.Any.OpenApiString("application/json;odata.metadata=minimal"),
-                        new Microsoft.OpenApi.Any.OpenApiString("application/json;odata.metadata=full")
+                        JsonValue.Create("application/json")!,
+                        JsonValue.Create("application/json;odata.metadata=none")!,
+                        JsonValue.Create("application/json;odata.metadata=minimal")!,
+                        JsonValue.Create("application/json;odata.metadata=full")!
                     }
                 }
             };
         }
 
-        private void AddPaginationResponseExample(OpenApiResponse response)
+        private static void AddPaginationResponseExample(IOpenApiResponse response)
         {
             if (response.Content == null || !response.Content.Any())
             {

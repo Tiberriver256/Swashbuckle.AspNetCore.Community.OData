@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.OpenApi;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
@@ -170,7 +171,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection
         /// <summary>
         /// Swagger documents to generate.
         /// </summary>
-        internal Dictionary<string, (string Route, Microsoft.OpenApi.Models.OpenApiInfo Info)> SwaggerDocs { get; } = new();
+        internal Dictionary<string, (string Route, OpenApiInfo Info)> SwaggerDocs { get; } = new();
 
         /// <summary>
         /// Settings for OData query options.
@@ -189,7 +190,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection
         /// <param name="odataRoute">OData route prefix.</param>
         /// <param name="info">API info.</param>
         /// <returns>This options instance.</returns>
-        public ODataSwaggerGenOptions AddDocument(string name, string odataRoute, Microsoft.OpenApi.Models.OpenApiInfo info)
+        public ODataSwaggerGenOptions AddDocument(string name, string odataRoute, OpenApiInfo info)
         {
             SwaggerDocs[name] = (odataRoute, info);
             return this;

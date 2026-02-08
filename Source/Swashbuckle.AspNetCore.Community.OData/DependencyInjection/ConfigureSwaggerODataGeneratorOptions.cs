@@ -3,7 +3,7 @@ using System.Linq;
 using Microsoft.AspNetCore.OData;
 using Microsoft.Extensions.Options;
 using Microsoft.OData.Edm;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 
 namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection
 {

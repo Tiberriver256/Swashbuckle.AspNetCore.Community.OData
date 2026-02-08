@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using Microsoft.OData.Edm;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.Community.OData.OpenApi;
 
 namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection

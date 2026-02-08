@@ -7,8 +7,10 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
-using Microsoft.OpenApi.Models;
+using System.Text.Json.Nodes;
+using Microsoft.OpenApi;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Swashbuckle.AspNetCore.Community.OData.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -34,7 +36,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
 
             // Assert
             var productsPath = document.Paths["/Products"];
-            var getOperation = productsPath.Operations[OperationType.Get];
+            var getOperation = productsPath.Operations[HttpMethod.Get];
 
             AssertHasParameter(getOperation, "$filter");
             AssertHasParameter(getOperation, "$select");
@@ -58,7 +60,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
 
             // Assert
             var singleProductPath = document.Paths["/Products({key})"];
-            var getOperation = singleProductPath.Operations[OperationType.Get];
+            var getOperation = singleProductPath.Operations[HttpMethod.Get];
 
             AssertDoesNotHaveParameter(getOperation, "$filter");
             AssertDoesNotHaveParameter(getOperation, "$top");
@@ -84,7 +86,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
 
             // Assert
             var productsPath = document.Paths["/Products"];
-            var getOperation = productsPath.Operations[OperationType.Get];
+            var getOperation = productsPath.Operations[HttpMethod.Get];
 
             AssertDoesNotHaveParameter(getOperation, "$filter");
             AssertDoesNotHaveParameter(getOperation, "$select");
@@ -104,18 +106,18 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
 
             // Assert
             var productsPath = document.Paths["/Products"];
-            var getOperation = productsPath.Operations[OperationType.Get];
+            var getOperation = productsPath.Operations[HttpMethod.Get];
 
             var topParam = GetSingleParameter(getOperation, "$top");
-            Assert.AreEqual("integer", topParam.Schema.Type);
+            Assert.AreEqual(JsonSchemaType.Integer, topParam.Schema.Type);
             Assert.AreEqual("int32", topParam.Schema.Format);
-            Assert.AreEqual(100m, topParam.Schema.Maximum);
+            Assert.AreEqual("100", topParam.Schema.Maximum);
 
             var countParam = GetSingleParameter(getOperation, "$count");
-            Assert.AreEqual("boolean", countParam.Schema.Type);
+            Assert.AreEqual(JsonSchemaType.Boolean, countParam.Schema.Type);
 
             var filterParam = GetSingleParameter(getOperation, "$filter");
-            Assert.AreEqual("string", filterParam.Schema.Type);
+            Assert.AreEqual(JsonSchemaType.String, filterParam.Schema.Type);
             Assert.AreEqual(ParameterLocation.Query, filterParam.In);
         }
 
@@ -138,7 +140,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
 
             // Assert
             var productsPath = document.Paths["/Products"];
-            var getOperation = productsPath.Operations[OperationType.Get];
+            var getOperation = productsPath.Operations[HttpMethod.Get];
 
             var filterParam = GetSingleParameter(getOperation, "$filter");
             Assert.IsNotNull(filterParam.Example);
@@ -153,14 +155,14 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
             // Arrange - Document with existing parameters
             var document = CreateTestDocument();
             var productsPath = document.Paths["/Products"];
-            var getOperation = productsPath.Operations[OperationType.Get];
+            var getOperation = productsPath.Operations[HttpMethod.Get];
 
             // Add an existing $filter parameter
             getOperation.Parameters.Add(new OpenApiParameter
             {
                 Name = "$filter",
                 In = ParameterLocation.Query,
-                Schema = new OpenApiSchema { Type = "string" }
+                Schema = new OpenApiSchema { Type = JsonSchemaType.String }
             });
 
             var filter = new ODataQueryOptionsDocumentFilter();
@@ -170,7 +172,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
             filter.Apply(document, context);
 
             // Assert
-            Assert.ContainsSingle((OpenApiParameter p) => p.Name == "$filter", getOperation.Parameters);
+            Assert.ContainsSingle((IOpenApiParameter p) => p.Name == "$filter", getOperation.Parameters);
         }
 
         [TestMethod]
@@ -190,7 +192,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
 
             // Assert
             var productsPath = document.Paths["/Products"];
-            var getOperation = productsPath.Operations[OperationType.Get];
+            var getOperation = productsPath.Operations[HttpMethod.Get];
 
             AssertHasParameter(getOperation, "$search");
         }
@@ -212,7 +214,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
 
             // Assert
             var productsPath = document.Paths["/Products"];
-            var getOperation = productsPath.Operations[OperationType.Get];
+            var getOperation = productsPath.Operations[HttpMethod.Get];
 
             var formatParam = GetSingleParameter(getOperation, "$format");
             Assert.IsNotNull(formatParam.Schema.Enum);
@@ -228,10 +230,10 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
             var productsPath = document.Paths["/Products"];
 
             // Add a POST operation
-            productsPath.Operations[OperationType.Post] = new OpenApiOperation
+            productsPath.Operations[HttpMethod.Post] = new OpenApiOperation
             {
                 Summary = "Create Product",
-                Parameters = new List<OpenApiParameter>()
+                Parameters = new List<IOpenApiParameter>()
             };
 
             var context = new DocumentFilterContext(new List<ApiDescription>(), null!, null!);
@@ -240,8 +242,8 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
             filter.Apply(document, context);
 
             // Assert - POST should not have query parameters
-            var postOperation = productsPath.Operations[OperationType.Post];
-            Assert.DoesNotContain((OpenApiParameter p) => p.Name.StartsWith('$'), postOperation.Parameters);
+            var postOperation = productsPath.Operations[HttpMethod.Post];
+            Assert.DoesNotContain((IOpenApiParameter p) => p.Name.StartsWith('$'), postOperation.Parameters);
         }
 
         [TestMethod]
@@ -276,25 +278,25 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
                 {
                     ["/Products"] = new OpenApiPathItem
                     {
-                        Operations = new Dictionary<OperationType, OpenApiOperation>
+                        Operations = new Dictionary<HttpMethod, OpenApiOperation>
                         {
-                            [OperationType.Get] = new OpenApiOperation
+                            [HttpMethod.Get] = new OpenApiOperation
                             {
                                 Summary = "Get Products",
-                                Parameters = new List<OpenApiParameter>(),
+                                Parameters = new List<IOpenApiParameter>(),
                                 Responses = new OpenApiResponses
                                 {
                                     ["200"] = new OpenApiResponse
                                     {
                                         Description = "Success",
-                                        Content = new Dictionary<string, OpenApiMediaType>
+                                        Content = new Dictionary<string, IOpenApiMediaType>
                                         {
                                             ["application/json"] = new OpenApiMediaType
                                             {
                                                 Schema = new OpenApiSchema
                                                 {
-                                                    Type = "array",
-                                                    Items = new OpenApiSchema { Type = "object" }
+                                                    Type = JsonSchemaType.Array,
+                                                    Items = new OpenApiSchema { Type = JsonSchemaType.Object }
                                                 }
                                             }
                                         }
@@ -305,12 +307,12 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
                     },
                     ["/Products({key})"] = new OpenApiPathItem
                     {
-                        Operations = new Dictionary<OperationType, OpenApiOperation>
+                        Operations = new Dictionary<HttpMethod, OpenApiOperation>
                         {
-                            [OperationType.Get] = new OpenApiOperation
+                            [HttpMethod.Get] = new OpenApiOperation
                             {
                                 Summary = "Get Product",
-                                Parameters = new List<OpenApiParameter>(),
+                                Parameters = new List<IOpenApiParameter>(),
                                 Responses = new OpenApiResponses
                                 {
                                     ["200"] = new OpenApiResponse { Description = "Success" }
@@ -324,17 +326,17 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
 
         private static void AssertHasParameter(OpenApiOperation operation, string parameterName)
         {
-            Assert.Contains((OpenApiParameter p) => p.Name == parameterName, operation.Parameters, $"Expected parameter '{parameterName}' to be present.");
+            Assert.Contains((IOpenApiParameter p) => p.Name == parameterName, operation.Parameters, $"Expected parameter '{parameterName}' to be present.");
         }
 
         private static void AssertDoesNotHaveParameter(OpenApiOperation operation, string parameterName)
         {
-            Assert.DoesNotContain((OpenApiParameter p) => p.Name == parameterName, operation.Parameters, $"Expected parameter '{parameterName}' to be absent.");
+            Assert.DoesNotContain((IOpenApiParameter p) => p.Name == parameterName, operation.Parameters, $"Expected parameter '{parameterName}' to be absent.");
         }
 
-        private static OpenApiParameter GetSingleParameter(OpenApiOperation operation, string parameterName)
+        private static IOpenApiParameter GetSingleParameter(OpenApiOperation operation, string parameterName)
         {
-            return Assert.ContainsSingle((OpenApiParameter p) => p.Name == parameterName, operation.Parameters, $"Expected exactly one '{parameterName}' parameter.");
+            return Assert.ContainsSingle((IOpenApiParameter p) => p.Name == parameterName, operation.Parameters, $"Expected exactly one '{parameterName}' parameter.");
         }
 
         #endregion

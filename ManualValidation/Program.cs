@@ -2,7 +2,7 @@ using ManualValidation;
 using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OData.ModelBuilder;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.Community.OData.DependencyInjection;
 using Swashbuckle.AspNetCore.Community.OData.OpenApi;
 
