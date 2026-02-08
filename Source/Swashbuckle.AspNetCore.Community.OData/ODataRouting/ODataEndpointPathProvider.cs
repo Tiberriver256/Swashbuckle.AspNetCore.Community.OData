@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.OData.Routing;
 using Microsoft.AspNetCore.OData.Routing.Template;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OData.Edm;
 using Microsoft.OpenApi.OData;
 using Microsoft.OpenApi.OData.Edm;
@@ -21,15 +20,15 @@ namespace Swashbuckle.AspNetCore.Community.OData.ODataRouting
 {
     /// <summary>
     /// Provides OData paths from actual ASP.NET Core endpoint routing data.
-    /// This captures real controller endpoints with their HTTP methods, 
+    /// This captures real controller endpoints with their HTTP methods,
     /// enabling accurate OpenAPI generation that reflects the actual API surface.
     /// </summary>
-    internal class ODataEndpointPathProvider : IODataPathProvider
+    public class ODataEndpointPathProvider : IODataPathProvider
     {
         private readonly IEdmModel _model;
         private readonly EndpointDataSource _endpointDataSource;
         private readonly string _routePrefix;
-        private IList<ODataPath> _paths;
+        private readonly IList<ODataPath> _paths;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ODataEndpointPathProvider"/> class.
@@ -65,11 +64,6 @@ namespace Swashbuckle.AspNetCore.Community.OData.ODataRouting
         /// </summary>
         private void CollectPathsFromEndpoints()
         {
-            if (_endpointDataSource == null)
-            {
-                return;
-            }
-
             var templateToPathDict = new Dictionary<string, ODataPath>();
 
             foreach (var endpoint in _endpointDataSource.Endpoints)
@@ -86,7 +80,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.ODataRouting
                     continue;
                 }
 
-                if (!(endpoint is RouteEndpoint routeEndpoint))
+                if (endpoint is not RouteEndpoint routeEndpoint)
                 {
                     continue;
                 }
@@ -99,24 +93,21 @@ namespace Swashbuckle.AspNetCore.Community.OData.ODataRouting
                 }
 
                 // Get HTTP methods from endpoint
-                var httpMethods = GetHttpMethods(endpoint);
+                var httpMethods = GetHttpMethods(endpoint).ToArray();
                 if (!httpMethods.Any())
                 {
                     // Default to GET if no methods specified
-                    httpMethods = new[] { "GET" };
+                    httpMethods = ["GET"];
                 }
 
                 // Check for existing path with same template
                 if (templateToPathDict.TryGetValue(routeTemplate, out var existingPath))
                 {
-                    // Add HTTP methods to existing path
-                    foreach (var method in httpMethods)
+                    foreach (var method in httpMethods.Where(method => !existingPath.HttpMethods.Contains(method)))
                     {
-                        if (!existingPath.HttpMethods.Contains(method))
-                        {
-                            existingPath.HttpMethods.Add(method);
-                        }
+                        existingPath.HttpMethods.Add(method);
                     }
+
                     continue;
                 }
 
@@ -136,9 +127,6 @@ namespace Swashbuckle.AspNetCore.Community.OData.ODataRouting
                     path.HttpMethods.Add(method);
                 }
 
-                // Store capabilities based on endpoint metadata
-                AddEndpointCapabilities(endpoint, path);
-
                 _paths.Add(path);
                 templateToPathDict[routeTemplate] = path;
             }
@@ -147,76 +135,24 @@ namespace Swashbuckle.AspNetCore.Community.OData.ODataRouting
         /// <summary>
         /// Extracts the route template from a RouteEndpoint, removing the OData prefix.
         /// </summary>
-        private string ExtractRouteTemplate(RouteEndpoint routeEndpoint, string prefix)
+        private static string ExtractRouteTemplate(RouteEndpoint routeEndpoint, string prefix)
         {
             string rawText = routeEndpoint.RoutePattern.RawText;
-            if (string.IsNullOrEmpty(rawText))
+            if (string.IsNullOrWhiteSpace(rawText))
             {
                 return null;
             }
 
-            // Remove prefix from route
-            int prefixLength = prefix?.Length ?? 0;
-            if (prefixLength > 0 && rawText.Length > prefixLength)
-            {
-                rawText = rawText.Substring(prefixLength);
-            }
-
-            // Ensure starts with /
-            if (!rawText.StartsWith("/"))
-            {
-                rawText = "/" + rawText;
-            }
-
-            return rawText;
+            return RemovePrefixSegment(rawText, prefix);
         }
 
         /// <summary>
         /// Gets HTTP methods from endpoint metadata.
         /// </summary>
-        private IEnumerable<string> GetHttpMethods(Endpoint endpoint)
+        private static IEnumerable<string> GetHttpMethods(Endpoint endpoint)
         {
             var httpMethodMetadata = endpoint.Metadata.GetMetadata<HttpMethodMetadata>();
-            if (httpMethodMetadata != null)
-            {
-                return httpMethodMetadata.HttpMethods;
-            }
-
-            // Try to infer from OData action metadata
-            var odataActionMetadata = endpoint.Metadata.GetMetadata<IActionHttpMethodProvider>();
-            if (odataActionMetadata != null)
-            {
-                return new[] { odataActionMetadata.HttpMethod };
-            }
-
-            return Enumerable.Empty<string>();
-        }
-
-        /// <summary>
-        /// Adds endpoint-specific capabilities to the OData path.
-        /// </summary>
-        private void AddEndpointCapabilities(Endpoint endpoint, ODataPath path)
-        {
-            // Check for EnableQuery attribute (indicates $filter, $select, etc. support)
-            var enableQueryMetadata = endpoint.Metadata.GetMetadata<IEnableQueryMetadata>();
-            if (enableQueryMetadata != null)
-            {
-                path.EnableQuery = true;
-                path.AllowedQueryOptions = enableQueryMetadata.AllowedQueryOptions;
-            }
-
-            // Check for specific OData capabilities
-            var capabilitiesMetadata = endpoint.Metadata.GetMetadata<IODataCapabilitiesMetadata>();
-            if (capabilitiesMetadata != null)
-            {
-                path.SupportsFilter = capabilitiesMetadata.SupportsFilter;
-                path.SupportsExpand = capabilitiesMetadata.SupportsExpand;
-                path.SupportsSelect = capabilitiesMetadata.SupportsSelect;
-                path.SupportsOrderBy = capabilitiesMetadata.SupportsOrderBy;
-                path.SupportsCount = capabilitiesMetadata.SupportsCount;
-                path.SupportsTop = capabilitiesMetadata.SupportsTop;
-                path.SupportsSkip = capabilitiesMetadata.SupportsSkip;
-            }
+            return httpMethodMetadata?.HttpMethods ?? Enumerable.Empty<string>();
         }
 
         /// <summary>
@@ -234,31 +170,19 @@ namespace Swashbuckle.AspNetCore.Community.OData.ODataRouting
             foreach (var segment in template)
             {
                 var translatedSegment = TranslateSegment(segment, model);
-                if (translatedSegment == null)
+                if (translatedSegment != null)
                 {
-                    // Some segments we skip (like dynamic segments)
-                    // but for property/value/count we should handle them
-                    translatedSegment = TryCreateSpecialSegment(segment, model);
-                    if (translatedSegment == null)
-                    {
-                        continue;
-                    }
+                    segments.Add(translatedSegment);
                 }
-                segments.Add(translatedSegment);
             }
 
-            if (!segments.Any())
-            {
-                return null;
-            }
-
-            return new ODataPath(segments);
+            return segments.Any() ? new ODataPath(segments) : null;
         }
 
         /// <summary>
         /// Translates a segment template to an OData segment.
         /// </summary>
-        private ODataSegment TranslateSegment(ODataSegmentTemplate segment, IEdmModel model)
+        private static ODataSegment TranslateSegment(ODataSegmentTemplate segment, IEdmModel model)
         {
             return segment switch
             {
@@ -272,131 +196,49 @@ namespace Swashbuckle.AspNetCore.Community.OData.ODataRouting
                 ActionSegmentTemplate action => new ODataOperationSegment(action.Action),
                 FunctionImportSegmentTemplate funcImport => new ODataOperationImportSegment(funcImport.FunctionImport, funcImport.ParameterMappings),
                 ActionImportSegmentTemplate actionImport => new ODataOperationImportSegment(actionImport.ActionImport),
-                CountSegmentTemplate count => new ODataDollarCountSegment(),
+                PropertySegmentTemplate property when property.Property.Type.IsComplex() => new ODataComplexPropertySegment(property.Property),
+                CountSegmentTemplate _ => new ODataDollarCountSegment(),
                 MetadataSegmentTemplate => new ODataMetadataSegment(),
                 _ => null
             };
         }
 
-        /// <summary>
-        /// Attempts to create segments for special cases like property access, value, etc.
-        /// </summary>
-        private ODataSegment TryCreateSpecialSegment(ODataSegmentTemplate segment, IEdmModel model)
+        private static string RemovePrefixSegment(string rawText, string prefix)
         {
-            // Handle property segment
-            if (segment is PropertySegmentTemplate propertySegment)
+            var normalizedPath = rawText.Trim();
+            if (!normalizedPath.StartsWith("/", StringComparison.Ordinal))
             {
-                // Create a property segment for accessing entity properties
-                return new ODataPropertySegment(propertySegment.Property);
+                normalizedPath = "/" + normalizedPath.TrimStart('/');
             }
 
-            // Handle value segment
-            if (segment is ValueSegmentTemplate)
+            if (string.IsNullOrWhiteSpace(prefix))
             {
-                return new ODataValueSegment();
+                return normalizedPath;
             }
 
-            // Handle navigation links
-            if (segment is NavigationLinkSegmentTemplate navLink)
+            var normalizedPrefix = prefix.Trim().Trim('/');
+            if (normalizedPrefix.Length == 0)
             {
-                return new ODataReferenceSegment(navLink.NavigationProperty);
+                return normalizedPath;
             }
 
-            return null;
+            var prefixSegment = "/" + normalizedPrefix;
+            var comparison = StringComparison.OrdinalIgnoreCase;
+
+            if (string.Equals(normalizedPath, prefixSegment, comparison) ||
+                string.Equals(normalizedPath, prefixSegment + "/", comparison))
+            {
+                return "/";
+            }
+
+            var prefixWithTrailingSlash = prefixSegment + "/";
+            if (normalizedPath.StartsWith(prefixWithTrailingSlash, comparison))
+            {
+                var remaining = normalizedPath.Substring(prefixWithTrailingSlash.Length);
+                return "/" + remaining.TrimStart('/');
+            }
+
+            return normalizedPath;
         }
-    }
-
-    /// <summary>
-    /// Represents a segment for accessing entity properties.
-    /// </summary>
-    internal class ODataPropertySegment : ODataSegment
-    {
-        private readonly IEdmStructuralProperty _property;
-
-        public ODataPropertySegment(IEdmStructuralProperty property)
-        {
-            _property = property;
-        }
-
-        public override string SegmentName => _property.Name;
-
-        public override IEdmType EdmType => _property.Type.Definition;
-    }
-
-    /// <summary>
-    /// Represents a $value segment.
-    /// </summary>
-    internal class ODataValueSegment : ODataSegment
-    {
-        public override string SegmentName => "$value";
-
-        public override IEdmType EdmType => null;
-    }
-
-    /// <summary>
-    /// Represents a $ref segment for navigation links.
-    /// </summary>
-    internal class ODataReferenceSegment : ODataSegment
-    {
-        private readonly IEdmNavigationProperty _navigationProperty;
-
-        public ODataReferenceSegment(IEdmNavigationProperty navigationProperty)
-        {
-            _navigationProperty = navigationProperty;
-        }
-
-        public override string SegmentName => "$ref";
-
-        public override IEdmType EdmType => _navigationProperty?.Type?.Definition;
-    }
-
-    /// <summary>
-    /// Extended ODataPath with additional endpoint metadata.
-    /// </summary>
-    internal class ODataPathWithMetadata : ODataPath
-    {
-        public ODataPathWithMetadata(IEnumerable<ODataSegment> segments) : base(segments)
-        {
-        }
-
-        public bool EnableQuery { get; set; }
-        public Microsoft.AspNetCore.OData.Query.AllowedQueryOptions AllowedQueryOptions { get; set; }
-        public bool SupportsFilter { get; set; }
-        public bool SupportsExpand { get; set; }
-        public bool SupportsSelect { get; set; }
-        public bool SupportsOrderBy { get; set; }
-        public bool SupportsCount { get; set; }
-        public bool SupportsTop { get; set; }
-        public bool SupportsSkip { get; set; }
-    }
-
-    /// <summary>
-    /// Interface for EnableQuery metadata.
-    /// </summary>
-    internal interface IEnableQueryMetadata
-    {
-        Microsoft.AspNetCore.OData.Query.AllowedQueryOptions AllowedQueryOptions { get; }
-    }
-
-    /// <summary>
-    /// Interface for OData capabilities metadata.
-    /// </summary>
-    internal interface IODataCapabilitiesMetadata
-    {
-        bool SupportsFilter { get; }
-        bool SupportsExpand { get; }
-        bool SupportsSelect { get; }
-        bool SupportsOrderBy { get; }
-        bool SupportsCount { get; }
-        bool SupportsTop { get; }
-        bool SupportsSkip { get; }
-    }
-
-    /// <summary>
-    /// Interface for HTTP method provider.
-    /// </summary>
-    internal interface IActionHttpMethodProvider
-    {
-        string HttpMethod { get; }
     }
 }

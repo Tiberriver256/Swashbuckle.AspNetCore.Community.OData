@@ -5,7 +5,6 @@
 // </copyright>
 //------------------------------------------------------------------------------
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.OpenApi.Models;
@@ -15,7 +14,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.OpenApi
 {
     /// <summary>
     /// Adds OData query options ($filter, $select, $expand, $orderby, $top, $skip, $count, $search)
-    /// to GET operations that have [EnableQuery] attribute.
+    /// to GET operations for collection-style OData paths.
     /// </summary>
     public class ODataQueryOptionsDocumentFilter : IDocumentFilter
     {
@@ -35,13 +34,10 @@ namespace Swashbuckle.AspNetCore.Community.OData.OpenApi
         {
             foreach (var path in swaggerDoc.Paths)
             {
-                if (path.Value.Operations.TryGetValue(OperationType.Get, out var getOperation))
+                if (path.Value.Operations.TryGetValue(OperationType.Get, out var getOperation)
+                    && IsCollectionEndpoint(path.Key))
                 {
-                    // Check if this is a collection endpoint by looking at the path structure
-                    if (IsCollectionEndpoint(path.Key))
-                    {
-                        AddODataQueryParameters(getOperation);
-                    }
+                    AddODataQueryParameters(getOperation);
                 }
             }
         }
@@ -73,6 +69,8 @@ namespace Swashbuckle.AspNetCore.Community.OData.OpenApi
         /// </summary>
         private void AddODataQueryParameters(OpenApiOperation operation)
         {
+            operation.Parameters ??= new List<OpenApiParameter>();
+
             var parameters = new List<OpenApiParameter>();
 
             if (_settings.EnableFilter)
@@ -121,13 +119,9 @@ namespace Swashbuckle.AspNetCore.Community.OData.OpenApi
             }
 
             // Add parameters to operation
-            foreach (var param in parameters)
+            foreach (var parameter in parameters.Where(param => !operation.Parameters.Any(existing => existing.Name == param.Name)))
             {
-                // Check if parameter already exists
-                if (!operation.Parameters.Any(p => p.Name == param.Name))
-                {
-                    operation.Parameters.Add(param);
-                }
+                operation.Parameters.Add(parameter);
             }
 
             // Add example response with @odata.count, @odata.nextLink if pagination enabled

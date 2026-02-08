@@ -160,18 +160,6 @@ namespace SimpleOdataApi
                 .IsInsertable(true)
                 .HasDescription("New forecasts can be added");
 
-            // Add query restrictions
-            builder.EntityType<WeatherForecast>()
-                .HasFilterRestrictions()
-                .IsFilterable(true)
-                .IsNonFilterableProperty("SecretData")
-                .HasDescription("Filtering supported except on SecretData");
-
-            builder.EntityType<WeatherForecast>()
-                .HasExpandRestrictions()
-                .IsExpandable(true)
-                .HasDescription("Navigation property expansion supported");
-
             builder.EntitySet<WeatherForecast>("WeatherForecasts");
 
             return builder.GetEdmModel();

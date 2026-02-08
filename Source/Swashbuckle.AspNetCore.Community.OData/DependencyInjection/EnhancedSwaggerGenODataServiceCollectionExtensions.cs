@@ -6,6 +6,7 @@
 //------------------------------------------------------------------------------
 
 using System;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -78,13 +79,21 @@ namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection
             Action<SwaggerGenODataOptions> odataSetupAction = null,
             ODataQueryOptionsSettings queryOptionsSettings = null)
         {
+            var resolvedQueryOptionsSettings = queryOptionsSettings ?? new ODataQueryOptionsSettings();
+
             // Add the enhanced OData Swagger generator
             services.AddEnhancedSwaggerGenOData(odataSetupAction);
+
+            // Wire query option settings into the OData generator options.
+            services.Configure<SwaggerGenODataOptions>(options =>
+            {
+                options.SwaggerGeneratorODataOptions.QueryOptionsSettings = resolvedQueryOptionsSettings;
+            });
 
             // Add OData query options document filter through SwaggerGen
             services.AddSwaggerGen(swaggerOptions =>
             {
-                swaggerOptions.DocumentFilter<ODataQueryOptionsDocumentFilter>(queryOptionsSettings ?? new ODataQueryOptionsSettings());
+                swaggerOptions.DocumentFilter<ODataQueryOptionsDocumentFilter>(resolvedQueryOptionsSettings);
             });
 
             return services;
@@ -132,6 +141,11 @@ namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection
                 {
                     opt.SwaggerDoc(doc.Key, doc.Value.Route, doc.Value.Info);
                 }
+            });
+
+            services.Configure<SwaggerGenODataOptions>(swaggerOptions =>
+            {
+                swaggerOptions.SwaggerGeneratorODataOptions.QueryOptionsSettings = options.QueryOptionsSettings;
             });
 
             // Add SwaggerGen with OData filters

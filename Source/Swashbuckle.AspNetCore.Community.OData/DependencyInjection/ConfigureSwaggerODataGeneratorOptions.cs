@@ -47,6 +47,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection
         {
             target.SwaggerDocs = new Dictionary<string, (string, OpenApiInfo)>(source.SwaggerDocs);
             target.EdmModels = new Dictionary<string, IEdmModel>(source.EdmModels);
+            target.QueryOptionsSettings = source.QueryOptionsSettings;
         }
     }
 }

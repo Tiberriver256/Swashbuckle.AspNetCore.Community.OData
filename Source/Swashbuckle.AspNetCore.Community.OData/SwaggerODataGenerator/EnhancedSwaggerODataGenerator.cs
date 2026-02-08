@@ -16,7 +16,9 @@ using Microsoft.Extensions.Options;
 using Microsoft.OData.Edm;
 using Microsoft.OpenApi.Models;
 using Microsoft.OpenApi.OData;
+using Swashbuckle.AspNetCore.Community.OData.DependencyInjection;
 using Swashbuckle.AspNetCore.Community.OData.ODataRouting;
+using Swashbuckle.AspNetCore.Community.OData.OpenApi;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace Swashbuckle.AspNetCore.Community.OData.SwaggerODataGenerator
@@ -28,6 +30,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.SwaggerODataGenerator
     public class EnhancedSwaggerODataGenerator : ISwaggerProvider
     {
         private readonly SwaggerODataGeneratorOptions _options;
+        private readonly ODataQueryOptionsSettings _queryOptionsSettings;
         private readonly IServiceProvider _serviceProvider;
 
         /// <summary>
@@ -40,6 +43,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.SwaggerODataGenerator
             IServiceProvider serviceProvider)
         {
             _options = options?.Value ?? new SwaggerODataGeneratorOptions();
+            _queryOptionsSettings = _options.QueryOptionsSettings ?? new ODataQueryOptionsSettings();
             _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
         }
 
@@ -88,7 +92,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.SwaggerODataGenerator
             var serviceRoot = BuildServiceRoot(host, basePath, routePrefix);
 
             // Create path provider with endpoint data
-            IODataPathProvider pathProvider = endpointDataSource != null
+            Microsoft.OpenApi.OData.Edm.IODataPathProvider pathProvider = endpointDataSource != null
                 ? new ODataEndpointPathProvider(model, endpointDataSource, routePrefix)
                 : null;
 
@@ -140,16 +144,46 @@ namespace Swashbuckle.AspNetCore.Community.OData.SwaggerODataGenerator
         /// <summary>
         /// Builds the service root URI.
         /// </summary>
-        private Uri BuildServiceRoot(string host, string basePath, string routePrefix)
+        private static Uri BuildServiceRoot(string host, string basePath, string routePrefix)
         {
-            var builder = new UriBuilder
-            {
-                Scheme = "https",
-                Host = host ?? "localhost",
-                Path = $"/{routePrefix}"
-            };
+            string scheme = "https";
+            string hostName = "localhost";
+            int port = -1;
 
-            return builder.Uri;
+            if (!string.IsNullOrWhiteSpace(host))
+            {
+                if (Uri.TryCreate(host, UriKind.Absolute, out var absoluteHost))
+                {
+                    scheme = absoluteHost.Scheme;
+                    hostName = absoluteHost.Host;
+                    port = absoluteHost.IsDefaultPort ? -1 : absoluteHost.Port;
+                }
+                else if (Uri.TryCreate($"https://{host}", UriKind.Absolute, out var hostWithDefaultScheme))
+                {
+                    hostName = hostWithDefaultScheme.Host;
+                    port = hostWithDefaultScheme.IsDefaultPort ? -1 : hostWithDefaultScheme.Port;
+                }
+            }
+
+            var pathParts = new List<string>();
+            if (!string.IsNullOrWhiteSpace(basePath))
+            {
+                pathParts.Add(basePath.Trim('/'));
+            }
+
+            if (!string.IsNullOrWhiteSpace(routePrefix))
+            {
+                pathParts.Add(routePrefix.Trim('/'));
+            }
+
+            var combinedPath = pathParts.Count == 0
+                ? "/"
+                : "/" + string.Join("/", pathParts);
+
+            return new UriBuilder(scheme, hostName, port)
+            {
+                Path = combinedPath
+            }.Uri;
         }
 
         /// <summary>
@@ -160,12 +194,12 @@ namespace Swashbuckle.AspNetCore.Community.OData.SwaggerODataGenerator
             foreach (var endpoint in endpointDataSource.Endpoints)
             {
                 var metadata = endpoint.Metadata.GetMetadata<Microsoft.AspNetCore.OData.Routing.IODataRoutingMetadata>();
-                if (metadata == null || metadata.Prefix != routePrefix)
+                if (metadata == null || !string.Equals(metadata.Prefix, routePrefix, StringComparison.OrdinalIgnoreCase))
                 {
                     continue;
                 }
 
-                if (!(endpoint is RouteEndpoint routeEndpoint))
+                if (endpoint is not RouteEndpoint routeEndpoint)
                 {
                     continue;
                 }
@@ -179,20 +213,20 @@ namespace Swashbuckle.AspNetCore.Community.OData.SwaggerODataGenerator
 
                 var pathItem = document.Paths[pathTemplate];
 
-                // Get HTTP methods
-                var httpMethods = GetHttpMethods(endpoint);
-                
-                // Ensure all declared HTTP methods are documented
-                foreach (var method in httpMethods)
+                var operationTypes = GetHttpMethods(endpoint)
+                    .Select(ParseOperationType)
+                    .Where(operationType => operationType.HasValue)
+                    .Select(operationType => operationType!.Value);
+
+                foreach (var operationType in operationTypes)
                 {
-                    var operationType = ParseOperationType(method);
-                    if (operationType.HasValue && !pathItem.Operations.ContainsKey(operationType.Value))
+                    if (!pathItem.Operations.ContainsKey(operationType))
                     {
                         // Create missing operation based on HTTP method conventions
-                        var operation = CreateDefaultOperation(endpoint, operationType.Value, pathTemplate);
+                        var operation = CreateDefaultOperation(endpoint, operationType, pathTemplate);
                         if (operation != null)
                         {
-                            pathItem.Operations[operationType.Value] = operation;
+                            pathItem.Operations[operationType] = operation;
                         }
                     }
                 }
@@ -241,7 +275,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.SwaggerODataGenerator
                 if (document.Paths.ContainsKey(entityByKeyPath))
                 {
                     // Add property access paths
-                    AddPropertyAccessPaths(pathsToAdd, entityType, entityByKeyPath, model);
+                    AddPropertyAccessPaths(pathsToAdd, entityType, entityByKeyPath);
 
                     // Add $value path
                     AddValuePath(pathsToAdd, entityByKeyPath);
@@ -259,7 +293,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.SwaggerODataGenerator
                 if (document.Paths.ContainsKey(singletonPath))
                 {
                     // Add property access paths for singleton
-                    AddPropertyAccessPaths(pathsToAdd, entityType, singletonPath, model);
+                    AddPropertyAccessPaths(pathsToAdd, entityType, singletonPath);
 
                     // Add $value path
                     AddValuePath(pathsToAdd, singletonPath);
@@ -282,7 +316,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.SwaggerODataGenerator
         /// <summary>
         /// Adds paths for accessing entity properties directly.
         /// </summary>
-        private void AddPropertyAccessPaths(Dictionary<string, OpenApiPathItem> paths, IEdmEntityType entityType, string basePath, IEdmModel model)
+        private void AddPropertyAccessPaths(Dictionary<string, OpenApiPathItem> paths, IEdmEntityType entityType, string basePath)
         {
             foreach (var property in entityType.DeclaredProperties.OfType<IEdmStructuralProperty>())
             {
@@ -425,10 +459,30 @@ namespace Swashbuckle.AspNetCore.Community.OData.SwaggerODataGenerator
         /// </summary>
         private OpenApiSchema CreatePropertySchema(IEdmStructuralProperty property)
         {
+            return CreateSchemaForEdmType(property.Type);
+        }
+
+        /// <summary>
+        /// Creates a schema for an EDM type reference.
+        /// Used for property types and array item schemas.
+        /// </summary>
+        private OpenApiSchema CreateSchemaForEdmType(IEdmTypeReference edmType)
+        {
+            if (edmType.IsCollection())
+            {
+                var elementType = edmType.AsCollection().ElementType();
+
+                return new OpenApiSchema
+                {
+                    Type = "array",
+                    Items = CreateSchemaForEdmType(elementType)
+                };
+            }
+
             return new OpenApiSchema
             {
-                Type = ConvertEdmTypeToOpenApiType(property.Type),
-                Format = ConvertEdmTypeToOpenApiFormat(property.Type)
+                Type = ConvertEdmTypeToOpenApiType(edmType),
+                Format = ConvertEdmTypeToOpenApiFormat(edmType)
             };
         }
 
@@ -437,7 +491,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.SwaggerODataGenerator
         /// </summary>
         private string ConvertEdmTypeToOpenApiType(IEdmTypeReference edmType)
         {
-            if (edmType.IsCollection)
+            if (edmType.IsCollection())
             {
                 return "array";
             }
@@ -469,7 +523,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.SwaggerODataGenerator
         /// </summary>
         private string ConvertEdmTypeToOpenApiFormat(IEdmTypeReference edmType)
         {
-            if (edmType.IsCollection)
+            if (edmType.IsCollection())
             {
                 return null;
             }
@@ -519,41 +573,75 @@ namespace Swashbuckle.AspNetCore.Community.OData.SwaggerODataGenerator
         /// </summary>
         private void AddQueryParametersToOperation(OpenApiOperation operation)
         {
-            var queryParameters = new[]
-            {
-                CreateQueryParameter("$filter", "Filter results using OData filter expressions", "string", "Name eq 'John'"),
-                CreateQueryParameter("$select", "Select specific properties", "string", "Name,Age"),
-                CreateQueryParameter("$expand", "Expand related entities", "string", "Orders"),
-                CreateQueryParameter("$orderby", "Order results by properties", "string", "Name asc"),
-                CreateQueryParameter("$top", "Limit number of results", "integer", null, "int32", 50),
-                CreateQueryParameter("$skip", "Skip first N results", "integer", null, "int32", 0),
-                CreateQueryParameter("$count", "Include total count", "boolean", null),
-                CreateQueryParameter("$search", "Free-text search", "string", null)
-            };
+            operation.Parameters ??= new List<OpenApiParameter>();
 
-            foreach (var param in queryParameters)
+            var queryParameters = new List<OpenApiParameter>();
+
+            if (_queryOptionsSettings.EnableFilter)
             {
-                if (!operation.Parameters.Any(p => p.Name == param.Name))
-                {
-                    operation.Parameters.Add(param);
-                }
+                queryParameters.Add(CreateQueryParameter("$filter", "Filter results using OData filter expressions", "string", _queryOptionsSettings.FilterExample));
+            }
+
+            if (_queryOptionsSettings.EnableSelect)
+            {
+                queryParameters.Add(CreateQueryParameter("$select", "Select specific properties", "string", _queryOptionsSettings.SelectExample));
+            }
+
+            if (_queryOptionsSettings.EnableExpand)
+            {
+                queryParameters.Add(CreateQueryParameter("$expand", "Expand related entities", "string", _queryOptionsSettings.ExpandExample));
+            }
+
+            if (_queryOptionsSettings.EnableOrderBy)
+            {
+                queryParameters.Add(CreateQueryParameter("$orderby", "Order results by properties", "string", _queryOptionsSettings.OrderByExample));
+            }
+
+            if (_queryOptionsSettings.EnableTop)
+            {
+                queryParameters.Add(CreateQueryParameter("$top", "Limit number of results", "integer", null, "int32", _queryOptionsSettings.DefaultTop, _queryOptionsSettings.MaxTop));
+            }
+
+            if (_queryOptionsSettings.EnableSkip)
+            {
+                queryParameters.Add(CreateQueryParameter("$skip", "Skip first N results", "integer", null, "int32", 0));
+            }
+
+            if (_queryOptionsSettings.EnableCount)
+            {
+                queryParameters.Add(CreateQueryParameter("$count", "Include total count", "boolean", null));
+            }
+
+            if (_queryOptionsSettings.EnableSearch)
+            {
+                queryParameters.Add(CreateQueryParameter("$search", "Free-text search", "string", null));
+            }
+
+            foreach (var parameter in queryParameters.Where(param => !operation.Parameters.Any(existing => existing.Name == param.Name)))
+            {
+                operation.Parameters.Add(parameter);
             }
         }
 
         /// <summary>
         /// Creates a query parameter.
         /// </summary>
-        private OpenApiParameter CreateQueryParameter(string name, string description, string type, string example, string format = null, object defaultValue = null)
+        private OpenApiParameter CreateQueryParameter(string name, string description, string type, string example, string format = null, object defaultValue = null, decimal? maximum = null)
         {
             var schema = new OpenApiSchema
             {
                 Type = type,
-                Format = format
+                Format = format,
+                Maximum = maximum
             };
 
-            if (defaultValue != null)
+            if (defaultValue is int intValue)
             {
-                schema.Default = defaultValue is int intVal ? new Microsoft.OpenApi.Any.OpenApiInteger(intVal) : new Microsoft.OpenApi.Any.OpenApiBoolean((bool)defaultValue);
+                schema.Default = new Microsoft.OpenApi.Any.OpenApiInteger(intValue);
+            }
+            else if (defaultValue is bool boolValue)
+            {
+                schema.Default = new Microsoft.OpenApi.Any.OpenApiBoolean(boolValue);
             }
 
             return new OpenApiParameter
@@ -570,31 +658,58 @@ namespace Swashbuckle.AspNetCore.Community.OData.SwaggerODataGenerator
         /// <summary>
         /// Extracts path template.
         /// </summary>
-        private string ExtractPathTemplate(string rawText, string prefix)
+        private static string ExtractPathTemplate(string rawText, string prefix)
         {
-            if (string.IsNullOrEmpty(rawText))
+            if (string.IsNullOrWhiteSpace(rawText))
             {
                 return null;
             }
 
-            int prefixLength = prefix?.Length ?? 0;
-            if (prefixLength > 0 && rawText.Length > prefixLength)
+            return RemovePrefixSegment(rawText, prefix);
+        }
+
+        private static string RemovePrefixSegment(string rawText, string prefix)
+        {
+            var normalizedPath = rawText.Trim();
+            if (!normalizedPath.StartsWith("/", StringComparison.Ordinal))
             {
-                rawText = rawText.Substring(prefixLength);
+                normalizedPath = "/" + normalizedPath.TrimStart('/');
             }
 
-            if (!rawText.StartsWith("/"))
+            if (string.IsNullOrWhiteSpace(prefix))
             {
-                rawText = "/" + rawText;
+                return normalizedPath;
             }
 
-            return rawText;
+            var normalizedPrefix = prefix.Trim().Trim('/');
+            if (normalizedPrefix.Length == 0)
+            {
+                return normalizedPath;
+            }
+
+            var prefixSegment = "/" + normalizedPrefix;
+            var comparison = StringComparison.OrdinalIgnoreCase;
+
+            if (string.Equals(normalizedPath, prefixSegment, comparison) ||
+                string.Equals(normalizedPath, prefixSegment + "/", comparison))
+            {
+                return "/";
+            }
+
+            var prefixWithTrailingSlash = prefixSegment + "/";
+            if (normalizedPath.StartsWith(prefixWithTrailingSlash, comparison))
+            {
+                var remaining = normalizedPath.Substring(prefixWithTrailingSlash.Length);
+                return "/" + remaining.TrimStart('/');
+            }
+
+            return normalizedPath;
         }
 
         /// <summary>
         /// Gets HTTP methods from endpoint.
         /// </summary>
-        private IEnumerable<string> GetHttpMethods(Endpoint endpoint)
+        private static IEnumerable<string> GetHttpMethods(Endpoint endpoint)
         {
             var metadata = endpoint.Metadata.GetMetadata<HttpMethodMetadata>();
             if (metadata != null)

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Microsoft.OData.Edm;
 using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Community.OData.OpenApi;
 
 namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection
 {
@@ -16,6 +17,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection
         {
             this.SwaggerDocs = new Dictionary<string, (string, OpenApiInfo)>();
             this.EdmModels = new Dictionary<string, IEdmModel>();
+            this.QueryOptionsSettings = new ODataQueryOptionsSettings();
         }
 
         /// <summary>
@@ -30,5 +32,10 @@ namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection
         /// Gets or sets OData Edm Models.
         /// </summary>
         public IDictionary<string, IEdmModel> EdmModels { get; set; }
+
+        /// <summary>
+        /// Gets or sets settings for generated OData query options.
+        /// </summary>
+        public ODataQueryOptionsSettings QueryOptionsSettings { get; set; }
     }
 }

@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Community.OData.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -26,7 +27,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
             // Arrange
             var filter = new ODataQueryOptionsDocumentFilter();
             var document = CreateTestDocument();
-            var context = new DocumentFilterContext(new List<ApiDescription>(), null, null);
+            var context = new DocumentFilterContext(new List<ApiDescription>(), null!, null!);
 
             // Act
             filter.Apply(document, context);
@@ -50,7 +51,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
             // Arrange
             var filter = new ODataQueryOptionsDocumentFilter();
             var document = CreateTestDocument();
-            var context = new DocumentFilterContext(new List<ApiDescription>(), null, null);
+            var context = new DocumentFilterContext(new List<ApiDescription>(), null!, null!);
 
             // Act
             filter.Apply(document, context);
@@ -76,7 +77,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
             };
             var filter = new ODataQueryOptionsDocumentFilter(settings);
             var document = CreateTestDocument();
-            var context = new DocumentFilterContext(new List<ApiDescription>(), null, null);
+            var context = new DocumentFilterContext(new List<ApiDescription>(), null!, null!);
 
             // Act
             filter.Apply(document, context);
@@ -96,7 +97,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
             // Arrange
             var filter = new ODataQueryOptionsDocumentFilter();
             var document = CreateTestDocument();
-            var context = new DocumentFilterContext(new List<ApiDescription>(), null, null);
+            var context = new DocumentFilterContext(new List<ApiDescription>(), null!, null!);
 
             // Act
             filter.Apply(document, context);
@@ -130,7 +131,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
             };
             var filter = new ODataQueryOptionsDocumentFilter(settings);
             var document = CreateTestDocument();
-            var context = new DocumentFilterContext(new List<ApiDescription>(), null, null);
+            var context = new DocumentFilterContext(new List<ApiDescription>(), null!, null!);
 
             // Act
             filter.Apply(document, context);
@@ -163,7 +164,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
             });
 
             var filter = new ODataQueryOptionsDocumentFilter();
-            var context = new DocumentFilterContext(new List<ApiDescription>(), null, null);
+            var context = new DocumentFilterContext(new List<ApiDescription>(), null!, null!);
 
             // Act
             filter.Apply(document, context);
@@ -182,7 +183,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
             };
             var filter = new ODataQueryOptionsDocumentFilter(settings);
             var document = CreateTestDocument();
-            var context = new DocumentFilterContext(new List<ApiDescription>(), null, null);
+            var context = new DocumentFilterContext(new List<ApiDescription>(), null!, null!);
 
             // Act
             filter.Apply(document, context);
@@ -204,7 +205,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
             };
             var filter = new ODataQueryOptionsDocumentFilter(settings);
             var document = CreateTestDocument();
-            var context = new DocumentFilterContext(new List<ApiDescription>(), null, null);
+            var context = new DocumentFilterContext(new List<ApiDescription>(), null!, null!);
 
             // Act
             filter.Apply(document, context);
@@ -232,7 +233,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
                 Parameters = new List<OpenApiParameter>()
             };
 
-            var context = new DocumentFilterContext(new List<ApiDescription>(), null, null);
+            var context = new DocumentFilterContext(new List<ApiDescription>(), null!, null!);
 
             // Act
             filter.Apply(document, context);
