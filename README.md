@@ -14,7 +14,7 @@ Provides full support for OData query options ($filter, $select, $expand, etc.),
 
 <img src="./Images/swagger-ui-demo.webp" alt="Swagger UI demo" width="800" />
 
-If animation is not shown in your Markdown viewer, open [`Images/swagger-ui-demo.webm`](./Images/swagger-ui-demo.webm) directly.
+If animation is not shown in your Markdown viewer, open [`Images/swagger-ui-demo.webp`](./Images/swagger-ui-demo.webp) directly.
 
 > [!TIP]
 > Start with [DOCUMENTATION.md](./DOCUMENTATION.md) for the canonical reference and [RELEASE_NOTES.md](./RELEASE_NOTES.md) for change history and breaking changes.
