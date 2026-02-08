@@ -8,35 +8,35 @@ The format is inspired by Keep a Changelog and uses semantic versioning.
 
 ### Added
 
+### Changed
+
+### Fixed
+
+## [2.0.0] - 2026-02-08
+
+### Added
+
 - Added a canonical documentation reference at `DOCUMENTATION.md`.
-- Added maintainer/release process docs:
-  - `DEVGUIDE.md`
-  - `MAINTAINERS.md`
-- Added contribution governance updates:
-  - stronger contribution requirements in `.github/CONTRIBUTING.md`
-  - PR checklist in `.github/PULL_REQUEST_TEMPLATE.md`
+- Added maintainer/release process docs: `DEVGUIDE.md` and `MAINTAINERS.md`.
+- Added contribution governance updates in `.github/CONTRIBUTING.md` and `.github/PULL_REQUEST_TEMPLATE.md`.
+- Added Swagger UI demo animation (`.webp`) to `README.md`. (#138)
 
 ### Changed
 
-- Upgraded to modern OpenAPI + Swashbuckle stack and migrated API usage to current OpenAPI model.
-- Made enhanced OData Swagger registration the default path and marked `AddSwaggerGenOData` legacy API as obsolete compatibility shim.
-- Moved manual validation app into samples as `Examples/ValidationHarness`.
+- Upgraded to modern OpenAPI + Swashbuckle stack and migrated API usage to the current OpenAPI model.
+- Made enhanced OData Swagger registration the default path and marked legacy `AddSwaggerGenOData` as an obsolete compatibility shim.
+- Moved the manual validation app into samples as `Examples/ValidationHarness`.
 - Aligned OData package versions for dependency compatibility.
-- Migrated test stack to MSTest + Microsoft.Testing.Platform and enabled analyzers.
+- Migrated the test stack to MSTest + Microsoft.Testing.Platform and enabled analyzers.
 - Removed FluentAssertions from tests.
-- Updated packaging/docs workflow:
-  - package readme is now included in NuGet package
-  - pack target focuses on the library project
+- Updated packaging/docs workflow: package README is included in NuGet package, and pack target focuses on the library project.
+- Upgraded GitHub Actions workflow action versions to current releases. (#139)
 
 ### Fixed
 
 - Resolved PR #137 review issues and endpoint/query-options wiring mismatches.
 - Fixed multiple path handling and route prefix trimming edge cases.
 - Eliminated build warnings across solution and CI builds.
-
-## [2.0.0] - TBD
-
-Release date is set when tag `v2.0.0` is created.
 
 ## [1.x and earlier]
 
