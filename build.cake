@@ -38,25 +38,19 @@ Task("Build")
     });
 
 Task("Test")
-    .Description("Runs unit tests and outputs test results to the artefacts directory.")
+    .Description("Runs unit tests.")
     .DoesForEach(GetFiles("./Tests/**/*.csproj"), project =>
     {
-        DotNetCoreTest(
-            project.ToString(),
-            new DotNetCoreTestSettings()
-            {
-                Blame = true,
-                Collectors = new string[] { "XPlat Code Coverage" },
-                Configuration = configuration,
-                Loggers = new string[]
-                {
-                    $"trx;LogFileName={project.GetFilenameWithoutExtension()}.trx",
-                    $"html;LogFileName={project.GetFilenameWithoutExtension()}.html",
-                },
-                NoBuild = true,
-                NoRestore = true,
-                ResultsDirectory = artefactsDirectory,
-            });
+        var processSettings = new ProcessSettings
+        {
+            Arguments = $"test --project \"{project.FullPath}\" --configuration {configuration} --no-build --no-restore",
+        };
+
+        var exitCode = StartProcess("dotnet", processSettings);
+        if (exitCode != 0)
+        {
+            throw new Exception($"dotnet test failed for {project}");
+        }
     });
 
 Task("Pack")
@@ -64,7 +58,7 @@ Task("Pack")
     .Does(() =>
     {
         DotNetCorePack(
-            ".",
+            "./Source/Swashbuckle.AspNetCore.Community.OData/Swashbuckle.AspNetCore.Community.OData.csproj",
             new DotNetCorePackSettings()
             {
                 Configuration = configuration,

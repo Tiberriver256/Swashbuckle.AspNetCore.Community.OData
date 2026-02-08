@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Microsoft.OData.Edm;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
+using Swashbuckle.AspNetCore.Community.OData.OpenApi;
 
 namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection
 {
@@ -16,19 +17,22 @@ namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection
         {
             this.SwaggerDocs = new Dictionary<string, (string, OpenApiInfo)>();
             this.EdmModels = new Dictionary<string, IEdmModel>();
+            this.QueryOptionsSettings = new ODataQueryOptionsSettings();
         }
 
         /// <summary>
         /// Gets or sets swagger documents that have been parsed from the OData Edm Models.
         /// </summary>
-        public IDictionary<
-            string,
-            (string OdataRoute, OpenApiInfo ApiInfo)
-        > SwaggerDocs { get; set; }
+        public IDictionary<string, (string OdataRoute, OpenApiInfo ApiInfo)> SwaggerDocs { get; set; }
 
         /// <summary>
         /// Gets or sets OData Edm Models.
         /// </summary>
         public IDictionary<string, IEdmModel> EdmModels { get; set; }
+
+        /// <summary>
+        /// Gets or sets settings for generated OData query options.
+        /// </summary>
+        public ODataQueryOptionsSettings QueryOptionsSettings { get; set; }
     }
 }

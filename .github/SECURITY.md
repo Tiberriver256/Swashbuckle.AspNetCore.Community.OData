@@ -6,4 +6,8 @@ This project supports only the latest version with security updates. However, we
 
 ## Reporting a Vulnerability
 
-Contact [user@example.com|@ExampleUser] to report a security vulnerability. You will be thanked!
+Report security vulnerabilities privately through GitHub Security Advisories:
+
+- https://github.com/tiberriver256/Swashbuckle.AspNetCore.Community.OData/security/advisories/new
+
+Please avoid filing public issues for undisclosed vulnerabilities.

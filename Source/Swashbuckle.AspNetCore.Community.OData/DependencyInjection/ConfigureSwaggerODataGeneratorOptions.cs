@@ -3,7 +3,7 @@ using System.Linq;
 using Microsoft.AspNetCore.OData;
 using Microsoft.Extensions.Options;
 using Microsoft.OData.Edm;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 
 namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection
 {
@@ -47,6 +47,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection
         {
             target.SwaggerDocs = new Dictionary<string, (string, OpenApiInfo)>(source.SwaggerDocs);
             target.EdmModels = new Dictionary<string, IEdmModel>(source.EdmModels);
+            target.QueryOptionsSettings = source.QueryOptionsSettings;
         }
     }
 }

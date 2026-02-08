@@ -1,16 +1,50 @@
-# All contributions, however small are valued!
+# Contributing
 
-# Steps to contribute
+Thank you for contributing to `Swashbuckle.AspNetCore.Community.OData`.
 
- If you want to make a small change, go ahead and raise a pull request, otherwise follow these steps:
+## Before opening a PR
 
-1. View the [Issues](https://github.com/tiberriver256/Swashbuckle.AspNetCore.Community.OData/issues) page to see a To-Do list of things to be implemented.
-2. Raise an issue or comment on an existing issue with what you want to contribute if one does not already exist.
-3. When you get the go ahead, follow the coding guidelines and raise a pull request.
-4. Include a link to the issue in your pull request.
+1. Check [open issues](https://github.com/tiberriver256/Swashbuckle.AspNetCore.Community.OData/issues).
+2. For non-trivial changes, open/discuss an issue first.
+3. Make sure your proposal fits the package scope: OData + Swashbuckle OpenAPI generation.
 
-# Coding Guidelines
+## Development workflow
 
-- Projects use StyleCop and .editorconfig to produce style warnings. Please fix all warnings in any code you submit.
-- Write unit tests for any code written.
+### Build and test locally
 
+```bash
+dotnet build Swashbuckle.AspNetCore.Community.OData.sln -c Release
+dotnet test --project Tests/Swashbuckle.AspNetCore.Community.OData.Test/Swashbuckle.AspNetCore.Community.OData.Test.csproj -c Release
+dotnet cake --target=Default
+```
+
+### Code quality expectations
+
+- Fix style/analyzer warnings in touched code.
+- Add or update tests for behavior changes.
+- Keep API behavior and docs aligned.
+
+## Documentation requirements
+
+For behavior-impacting changes, update the relevant documentation:
+
+- `README.md` for top-level usage
+- `DOCUMENTATION.md` for detailed behavior/reference
+- `ENHANCED_FEATURES.md` for feature-centric examples (when needed)
+- `RELEASE_NOTES.md` for notable changes and breaking changes
+
+PRs that change behavior without doc updates may be asked to add docs before merge.
+
+## Pull request checklist
+
+- [ ] Linked related issue(s)
+- [ ] Added/updated tests
+- [ ] Updated docs where applicable
+- [ ] Added/updated release notes where applicable
+- [ ] Verified local build/test pass
+
+## Branch and merge notes
+
+- Keep PRs focused and reasonably scoped.
+- Include migration notes when introducing breaking changes.
+- Do not merge with failing required checks.

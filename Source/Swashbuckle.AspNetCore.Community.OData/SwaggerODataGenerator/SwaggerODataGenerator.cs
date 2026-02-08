@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Microsoft.Extensions.Options;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using Microsoft.OpenApi.OData;
 using Swashbuckle.AspNetCore.Swagger;
 
@@ -64,8 +64,9 @@ namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection
                     CultureInfo.InvariantCulture,
                     "Unknown EdmModel document - \"{0}\". Known EdmModels: {1}",
                     documentName,
-                    string.Join(",", knownEdmModels.Select((string x) => "\"" + x + "\""))
+                    string.Join(",", knownEdmModels.Select(x => $"\"{x}\""))
                 )
-            ) { }
+            )
+        { }
     }
 }

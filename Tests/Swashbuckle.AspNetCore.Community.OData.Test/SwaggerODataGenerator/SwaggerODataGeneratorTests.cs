@@ -1,15 +1,15 @@
-using FluentAssertions;
 using Microsoft.Extensions.Options;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
-using Microsoft.OpenApi.Models;
-using Xunit;
+using Microsoft.OpenApi;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection.Tests
 {
+    [TestClass]
     public class SwaggerODataGeneratorTests
     {
-        [Fact]
+        [TestMethod]
         public void GetSwagger_GeneratesSwaggerDocument_ForApiDescriptionsWithMatchingGroupName()
         {
             // Arrange
@@ -28,10 +28,10 @@ namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection.Tests
             var document = subject.GetSwagger("v1");
 
             // Assert
-            document.Info.Version.Should().Be("V1");
-            document.Info.Title.Should().Be("Test API");
-            document.Paths.Keys.Should().Contain("/People");
-            document.Paths.Keys.Should().Contain("/People({Id})");
+            Assert.AreEqual("V1", document.Info.Version);
+            Assert.AreEqual("Test API", document.Info.Title);
+            Assert.Contains("/People", document.Paths.Keys);
+            Assert.Contains("/People({Id})", document.Paths.Keys);
         }
 
         private static IEdmModel GetFakeEdmModel()
