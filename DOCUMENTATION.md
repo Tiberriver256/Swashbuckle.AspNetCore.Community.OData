@@ -102,8 +102,6 @@ builder.Services.AddEnhancedSwaggerGenODataWithQueryOptions(
         MaxTop = 100
     });
 
-builder.Services.AddSwaggerGen();
-
 var app = builder.Build();
 
 app.UseSwagger();
@@ -146,6 +144,8 @@ services.AddEnhancedSwaggerGenOData(options =>
 #### `AddEnhancedSwaggerGenODataWithQueryOptions`
 
 Same as above + registers `ODataQueryOptionsDocumentFilter` and applies `ODataQueryOptionsSettings`.
+
+This method already wires `AddSwaggerGen(...)`; do not add a second bare `AddSwaggerGen()` call after it in the same registration path.
 
 ```csharp
 services.AddEnhancedSwaggerGenODataWithQueryOptions(
@@ -194,7 +194,7 @@ Plan migration to `AddEnhancedSwaggerGenOData(...)` or `AddEnhancedSwaggerGenODa
 
 ### SwaggerGenODataOptions
 
-Container for `SwaggerGeneratorODataOptions`.
+Container for `SwaggerODataGeneratorOptions` (via the `SwaggerGeneratorODataOptions` property).
 
 ### SwaggerODataGeneratorOptions
 

@@ -23,7 +23,7 @@ If animation is not shown in your Markdown viewer, open [`Images/swagger-ui-demo
 
 ## ✨ Features
 
-- 🔍 **Full OData Query Support** - Automatic documentation of `$filter`, `$select`, `$expand`, `$orderby`, `$top`, `$skip`, `$count`, `$search`
+- 🔍 **Full OData Query Support** - Automatic documentation of `$filter`, `$select`, `$expand`, `$orderby`, `$top`, `$skip`, `$count`, `$format` (and `$search` when enabled)
 - 📡 **Real Endpoint-Based Generation** - Uses actual ASP.NET Core endpoint routing for accurate API documentation
 - 🎯 **Complete OData Path Coverage** - Entity sets, singletons, functions, actions, property access, `$value`, `$ref`
 - 🚀 **HTTP Method Accuracy** - Correctly captures GET, POST, PUT, PATCH, DELETE with proper request/response schemas
@@ -76,8 +76,6 @@ public void ConfigureServices(IServiceCollection services)
         }
     );
 
-    // Add Swashbuckle services
-    services.AddSwaggerGen();
 }
 
 public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -131,8 +129,6 @@ builder.Services.AddEnhancedSwaggerGenODataWithQueryOptions(
         });
     });
 
-builder.Services.AddSwaggerGen();
-
 var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "My OData API v1"));
@@ -140,7 +136,7 @@ app.MapControllers();
 app.Run();
 ```
 
-## 📖 Upcoming in v2.0 (Unreleased)
+## 📖 v2.0 Feature Set (Released)
 
 ### Enhanced Features
 
@@ -150,7 +146,8 @@ app.Run();
 - **Method Overload Support**: Multiple actions with same name are correctly documented
 - **Better HTTP Semantics**: Accurate methods, status codes, request/response schemas
 
-Track current release status in [RELEASE_NOTES.md](./RELEASE_NOTES.md#unreleased).
+These features shipped in the v2.0 line (starting with v2.0.0).
+Track version-by-version status in [RELEASE_NOTES.md](./RELEASE_NOTES.md).
 See [ENHANCED_FEATURES.md](./ENHANCED_FEATURES.md) for detailed feature documentation.
 
 ## 📊 Comparison with Other Approaches
