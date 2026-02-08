@@ -140,7 +140,7 @@ app.MapControllers();
 app.Run();
 ```
 
-## 📖 Upcoming in v2.0 (Unreleased)
+## 📖 v2.0 Feature Set (Released)
 
 ### Enhanced Features
 
@@ -150,7 +150,8 @@ app.Run();
 - **Method Overload Support**: Multiple actions with same name are correctly documented
 - **Better HTTP Semantics**: Accurate methods, status codes, request/response schemas
 
-Track current release status in [RELEASE_NOTES.md](./RELEASE_NOTES.md#unreleased).
+These features shipped in the v2.0 line (starting with v2.0.0).
+Track version-by-version status in [RELEASE_NOTES.md](./RELEASE_NOTES.md).
 See [ENHANCED_FEATURES.md](./ENHANCED_FEATURES.md) for detailed feature documentation.
 
 ## 📊 Comparison with Other Approaches
