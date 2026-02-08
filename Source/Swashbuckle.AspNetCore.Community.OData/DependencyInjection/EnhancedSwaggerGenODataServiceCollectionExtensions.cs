@@ -49,8 +49,8 @@ namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection
                 ConfigureSwaggerODataGeneratorOptions
             >();
 
-            // Register the enhanced generator
-            services.TryAddTransient<ISwaggerProvider, EnhancedSwaggerODataGenerator>();
+            // Register the enhanced generator as the active ISwaggerProvider.
+            EnsureEnhancedSwaggerProvider(services);
 
             // Register transient access to options
             services.TryAddTransient(s =>
@@ -90,6 +90,9 @@ namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection
 
             // Add OData query options document filter through SwaggerGen
             services.AddSwaggerGen(swaggerOptions => swaggerOptions.DocumentFilter<ODataQueryOptionsDocumentFilter>(resolvedQueryOptionsSettings));
+
+            // AddSwaggerGen may register a different ISwaggerProvider; force enhanced provider.
+            EnsureEnhancedSwaggerProvider(services);
 
             return services;
         }
@@ -150,7 +153,16 @@ namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection
                 options.ConfigureSwaggerGen?.Invoke(swaggerOptions);
             });
 
+            // AddSwaggerGen may register a different ISwaggerProvider; force enhanced provider.
+            EnsureEnhancedSwaggerProvider(services);
+
             return services;
+        }
+
+        private static void EnsureEnhancedSwaggerProvider(IServiceCollection services)
+        {
+            services.Replace(ServiceDescriptor.Transient<ISwaggerProvider, EnhancedSwaggerODataGenerator>());
+            services.Replace(ServiceDescriptor.Transient<IAsyncSwaggerProvider, EnhancedSwaggerODataGenerator>());
         }
     }
 

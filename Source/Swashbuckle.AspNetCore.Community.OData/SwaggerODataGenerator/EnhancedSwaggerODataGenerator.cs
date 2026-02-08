@@ -11,6 +11,7 @@ using System.Globalization;
 using System.Linq;
 using System.Net.Http;
 using System.Text.Json.Nodes;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,7 +30,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.SwaggerODataGenerator
     /// Enhanced Swagger generator for OData that uses actual endpoint routing data
     /// to produce accurate OpenAPI documentation with full OData query support.
     /// </summary>
-    public class EnhancedSwaggerODataGenerator : ISwaggerProvider
+    public class EnhancedSwaggerODataGenerator : ISwaggerProvider, IAsyncSwaggerProvider
     {
         private readonly SwaggerODataGeneratorOptions generatorOptions;
         private readonly ODataQueryOptionsSettings queryOptionsSettings;
@@ -78,6 +79,10 @@ namespace Swashbuckle.AspNetCore.Community.OData.SwaggerODataGenerator
 
             return document;
         }
+
+        /// <inheritdoc/>
+        public Task<OpenApiDocument> GetSwaggerAsync(string documentName, string? host = null, string? basePath = null)
+            => Task.FromResult(this.GetSwagger(documentName, host, basePath));
 
         /// <summary>
         /// Creates an OpenAPI document from the EDM model with endpoint routing data.
