@@ -10,6 +10,9 @@
 
 Provides full support for OData query options ($filter, $select, $expand, etc.), real endpoint-based path generation, and seamless Swashbuckle integration.
 
+> [!TIP]
+> Start with [DOCUMENTATION.md](./DOCUMENTATION.md) for the canonical reference and [RELEASE_NOTES.md](./RELEASE_NOTES.md) for change history and breaking changes.
+
 ## ✨ Features
 
 - 🔍 **Full OData Query Support** - Automatic documentation of `$filter`, `$select`, `$expand`, `$orderby`, `$top`, `$skip`, `$count`, `$search`
@@ -211,7 +214,11 @@ services.AddSwaggerGen(options =>
 
 ## 📚 Documentation
 
-- [ENHANCED_FEATURES.md](./ENHANCED_FEATURES.md) - Detailed feature documentation
+- [DOCUMENTATION.md](./DOCUMENTATION.md) - Canonical reference and configuration guide
+- [ENHANCED_FEATURES.md](./ENHANCED_FEATURES.md) - Feature-focused deep dive
+- [RELEASE_NOTES.md](./RELEASE_NOTES.md) - Release and breaking-change history
+- [DEVGUIDE.md](./DEVGUIDE.md) - Maintainer release/build workflow
+- [MAINTAINERS.md](./MAINTAINERS.md) - Maintainer list
 - [Examples/SimpleOdataApi](./Examples/SimpleOdataApi) - Sample implementation
 - [OData to OpenAPI Mapping](https://www.oasis-open.org/committees/document.php?document_id=61852&wg_abbrev=odata) - Official OData OpenAPI specification
 
@@ -227,7 +234,13 @@ dotnet test
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please read our [Contributing Guidelines](.github/CONTRIBUTING.md) for details.
+Contributions are welcome. Please read our [Contributing Guidelines](.github/CONTRIBUTING.md).
+
+For behavior-affecting changes, contributions are expected to include:
+
+- unit/integration test updates
+- relevant documentation updates (`README.md` and/or `DOCUMENTATION.md`)
+- release note entries in `RELEASE_NOTES.md` when appropriate
 
 ## 📄 License
 

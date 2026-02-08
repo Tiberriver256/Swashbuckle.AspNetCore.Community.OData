@@ -10,9 +10,9 @@ This report documents the manual validation of the enhanced OData Swagger featur
 
 ## ✅ Test Environment
 
-- **Runtime:** .NET 8.0
-- **OData Version:** 9.0.0
-- **Swashbuckle Version:** 6.9.0
+- **Runtime:** .NET 10.0
+- **OData Version:** 9.4.1
+- **Swashbuckle Version:** 10.1.2
 - **Test URL:** http://localhost:5000
 
 ## 📊 Test Results Summary

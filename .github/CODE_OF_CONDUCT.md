@@ -55,8 +55,13 @@ further defined and clarified by project maintainers.
 ## Enforcement
 
 Instances of abusive, harassing, or otherwise unacceptable behaviour may be
-reported by contacting [user@example.com|@ExampleUser]. All
-complaints will be reviewed and investigated and will result in a response that
+reported by opening a private discussion with maintainers or by opening an issue
+in this repository and requesting maintainer contact:
+
+- https://github.com/tiberriver256/Swashbuckle.AspNetCore.Community.OData/discussions
+- https://github.com/tiberriver256/Swashbuckle.AspNetCore.Community.OData/issues
+
+All complaints will be reviewed and investigated and will result in a response that
 is deemed necessary and appropriate to the circumstances. The project team is
 obligated to maintain confidentiality with regard to the reporter of an incident.
 Further details of specific enforcement policies may be posted separately.

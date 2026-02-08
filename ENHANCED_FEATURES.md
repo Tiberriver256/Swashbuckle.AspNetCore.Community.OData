@@ -2,6 +2,9 @@
 
 This document describes the enhanced features added to `Swashbuckle.AspNetCore.Community.OData` that make it the most comprehensive OData OpenAPI documentation solution available.
 
+> [!NOTE]
+> This is a feature-focused companion guide. For the canonical API/configuration reference, use [DOCUMENTATION.md](./DOCUMENTATION.md).
+
 ## 🚀 Quick Start
 
 ```csharp
