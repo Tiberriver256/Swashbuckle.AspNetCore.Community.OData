@@ -10,18 +10,19 @@ using System.Linq;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.OpenApi.Models;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Swashbuckle.AspNetCore.Community.OData.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using Xunit;
 
 namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
 {
     /// <summary>
     /// Tests for the ODataQueryOptionsDocumentFilter.
     /// </summary>
+    [TestClass]
     public class ODataQueryOptionsDocumentFilterTests
     {
-        [Fact]
+        [TestMethod]
         public void Apply_AddsODataQueryParameters_ToCollectionEndpoints()
         {
             // Arrange
@@ -45,7 +46,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
             getOperation.Parameters.Should().Contain(p => p.Name == "$count");
         }
 
-        [Fact]
+        [TestMethod]
         public void Apply_DoesNotAddParameters_ToSingleEntityEndpoints()
         {
             // Arrange
@@ -65,7 +66,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
             getOperation.Parameters.Should().NotContain(p => p.Name == "$skip");
         }
 
-        [Fact]
+        [TestMethod]
         public void Apply_WithDisabledSettings_DoesNotAddParameters()
         {
             // Arrange
@@ -91,7 +92,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
             getOperation.Parameters.Should().NotContain(p => p.Name == "$expand");
         }
 
-        [Fact]
+        [TestMethod]
         public void Apply_AddsCorrectParameterTypes()
         {
             // Arrange
@@ -119,7 +120,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
             filterParam.In.Should().Be(ParameterLocation.Query);
         }
 
-        [Fact]
+        [TestMethod]
         public void Apply_AddsExamplesToParameters()
         {
             // Arrange
@@ -147,7 +148,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
             selectParam.Example.Should().NotBeNull();
         }
 
-        [Fact]
+        [TestMethod]
         public void Apply_DoesNotDuplicateParameters()
         {
             // Arrange - Document with existing parameters
@@ -173,7 +174,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
             getOperation.Parameters.Where(p => p.Name == "$filter").Should().HaveCount(1);
         }
 
-        [Fact]
+        [TestMethod]
         public void Apply_WithSearchEnabled_AddsSearchParameter()
         {
             // Arrange
@@ -195,7 +196,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
             getOperation.Parameters.Should().Contain(p => p.Name == "$search");
         }
 
-        [Fact]
+        [TestMethod]
         public void Apply_WithFormatEnabled_AddsFormatParameter()
         {
             // Arrange
@@ -218,7 +219,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
             formatParam.Schema.Enum.Should().NotBeNullOrEmpty();
         }
 
-        [Fact]
+        [TestMethod]
         public void Apply_SkipsNonGetOperations()
         {
             // Arrange
@@ -243,7 +244,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.OpenApi
             postOperation.Parameters.Should().NotContain(p => p.Name.StartsWith("$"));
         }
 
-        [Fact]
+        [TestMethod]
         public void Settings_DefaultValues_AreCorrect()
         {
             // Arrange & Act

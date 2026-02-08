@@ -18,17 +18,18 @@ using Microsoft.Extensions.Primitives;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OpenApi.OData;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Swashbuckle.AspNetCore.Community.OData.ODataRouting;
-using Xunit;
 
 namespace Swashbuckle.AspNetCore.Community.OData.Tests.ODataRouting
 {
     /// <summary>
     /// Tests for the ODataEndpointPathProvider.
     /// </summary>
+    [TestClass]
     public class ODataEndpointPathProviderTests
     {
-        [Fact]
+        [TestMethod]
         public void GetPaths_WithNoEndpoints_ReturnsEmptyList()
         {
             // Arrange
@@ -44,7 +45,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.ODataRouting
             paths.Should().BeEmpty();
         }
 
-        [Fact]
+        [TestMethod]
         public void GetPaths_WithODataEndpoints_ReturnsPaths()
         {
             // Arrange
@@ -63,7 +64,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.ODataRouting
             paths.Should().Contain(p => p.PathTemplate == "/Products({key})");
         }
 
-        [Fact]
+        [TestMethod]
         public void GetPaths_WithDifferentPrefix_FiltersByPrefix()
         {
             // Arrange
@@ -85,7 +86,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.ODataRouting
             paths.Should().OnlyContain(p => p.PathTemplate == "/Products");
         }
 
-        [Fact]
+        [TestMethod]
         public void GetPaths_CapturesHttpMethods()
         {
             // Arrange
@@ -108,7 +109,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.ODataRouting
             productPath.HttpMethods.Should().Contain("POST");
         }
 
-        [Fact]
+        [TestMethod]
         public void GetPaths_MergesDuplicatePaths()
         {
             // Arrange - Multiple operations on same path
@@ -133,7 +134,7 @@ namespace Swashbuckle.AspNetCore.Community.OData.Tests.ODataRouting
             singleProductPath.HttpMethods.Should().Contain(new[] { "GET", "PUT", "PATCH", "DELETE" });
         }
 
-        [Fact]
+        [TestMethod]
         public void CanFilter_AlwaysReturnsTrue()
         {
             // Arrange

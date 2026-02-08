@@ -3,13 +3,14 @@ using Microsoft.Extensions.Options;
 using Microsoft.OData.Edm;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OpenApi.Models;
-using Xunit;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Swashbuckle.AspNetCore.Community.OData.DependencyInjection.Tests
 {
+    [TestClass]
     public class SwaggerODataGeneratorTests
     {
-        [Fact]
+        [TestMethod]
         public void GetSwagger_GeneratesSwaggerDocument_ForApiDescriptionsWithMatchingGroupName()
         {
             // Arrange
