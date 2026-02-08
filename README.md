@@ -10,6 +10,12 @@
 
 Provides full support for OData query options ($filter, $select, $expand, etc.), real endpoint-based path generation, and seamless Swashbuckle integration.
 
+## 🎬 Swagger UI Demo
+
+<video src="./Images/swagger-ui-demo.webm" controls muted loop playsinline width="960"></video>
+
+If your Markdown viewer does not render embedded video, open [`Images/swagger-ui-demo.webm`](./Images/swagger-ui-demo.webm) directly.
+
 > [!TIP]
 > Start with [DOCUMENTATION.md](./DOCUMENTATION.md) for the canonical reference and [RELEASE_NOTES.md](./RELEASE_NOTES.md) for change history and breaking changes.
 >
