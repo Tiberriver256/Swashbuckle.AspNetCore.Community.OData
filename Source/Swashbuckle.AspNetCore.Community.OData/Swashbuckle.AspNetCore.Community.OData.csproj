@@ -20,7 +20,7 @@
     <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="10.1.2" />
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="10.1.2" />
     <PackageReference Include="Microsoft.AspNetCore.OData" Version="9.4.1" />
-    <PackageReference Update="Microsoft.SourceLink.GitHub" Version="10.0.102" />
+    <PackageReference Update="Microsoft.SourceLink.GitHub" Version="10.0.203" />
   </ItemGroup>
   <Target Name="Husky" BeforeTargets="Restore;CollectPackageReferences" Condition="'$(GITHUB_WORKFLOW)' == ''">
     <Exec Command="dotnet tool restore" StandardOutputImportance="Low" StandardErrorImportance="High" />
