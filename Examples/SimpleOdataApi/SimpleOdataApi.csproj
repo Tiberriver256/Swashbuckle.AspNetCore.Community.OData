@@ -13,9 +13,9 @@
     <PackageReference Update="Microsoft.VisualStudio.Threading.Analyzers" Version="17.11.20" />
   </ItemGroup>
   <ItemGroup>
-    <EditorConfigFiles Remove="C:\my\personal\Swashbuckle.AspNetCore.Community.OData\Examples\SimpleOdataApi\.editorconfig" />
+    <EditorConfigFiles Remove=".editorconfig" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="C:\my\personal\Swashbuckle.AspNetCore.Community.OData\Examples\SimpleOdataApi\.editorconfig" />
+    <None Include=".editorconfig" />
   </ItemGroup>
 </Project>
