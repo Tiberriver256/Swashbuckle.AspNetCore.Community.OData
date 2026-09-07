@@ -12,6 +12,9 @@
   </PropertyGroup>
 
   <PropertyGroup Label="Signing">
+    <!-- Key.snk is intentionally committed: OSS public signing key for strong-naming.
+         Anyone can build and verify the assembly identity; it confers no release authority.
+         Do not use this key for private/secret signing scenarios. -->
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>../../Key.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
@@ -26,7 +29,7 @@
   </PropertyGroup>
 
   <ItemGroup Label="Package References">
-    <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="all" Version="10.0.102" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" PrivateAssets="all" Version="10.0.300" />
   </ItemGroup>
 
   <ItemGroup Label="Files">

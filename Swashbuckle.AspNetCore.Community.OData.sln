@@ -77,6 +77,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{19
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleOdataApi", "Examples\SimpleOdataApi\SimpleOdataApi.csproj", "{22BCB82C-4504-4577-ACA5-F7DBD9DC3E00}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ValidationHarness", "Examples\ValidationHarness\ValidationHarness.csproj", "{C4D5E6F7-A8B9-4C0D-9E1F-2A3B4C5D6E7F}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".husky", ".husky", "{FC6E12AF-F637-426B-9624-200454FC487C}"
 	ProjectSection(SolutionItems) = preProject
 		.husky\pre-commit = .husky\pre-commit
@@ -101,6 +103,10 @@ Global
 		{22BCB82C-4504-4577-ACA5-F7DBD9DC3E00}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{22BCB82C-4504-4577-ACA5-F7DBD9DC3E00}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{22BCB82C-4504-4577-ACA5-F7DBD9DC3E00}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C4D5E6F7-A8B9-4C0D-9E1F-2A3B4C5D6E7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4D5E6F7-A8B9-4C0D-9E1F-2A3B4C5D6E7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4D5E6F7-A8B9-4C0D-9E1F-2A3B4C5D6E7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4D5E6F7-A8B9-4C0D-9E1F-2A3B4C5D6E7F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -114,6 +120,7 @@ Global
 		{841C67EF-BBB2-4730-8E29-22FF3FD54306} = {EFE1E5ED-D337-4874-82EC-D9FA0BC7D3AB}
 		{194BF3FD-A541-4917-A30D-950EB60B3587} = {7EDFA103-DB69-4C88-9DE4-97ADBF8253A1}
 		{22BCB82C-4504-4577-ACA5-F7DBD9DC3E00} = {194BF3FD-A541-4917-A30D-950EB60B3587}
+		{C4D5E6F7-A8B9-4C0D-9E1F-2A3B4C5D6E7F} = {194BF3FD-A541-4917-A30D-950EB60B3587}
 		{FC6E12AF-F637-426B-9624-200454FC487C} = {F20E2797-D1E3-4321-91BB-FAE54954D2A0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
