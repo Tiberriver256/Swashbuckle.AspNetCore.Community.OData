@@ -8,7 +8,7 @@ The format is inspired by Keep a Changelog and uses semantic versioning.
 
 ### Added
 
-- Added XPlat Code Coverage collection (`coverlet.collector`) with Codecov upload in CI.
+- Added coverage collection (`Microsoft.Testing.Extensions.CodeCoverage`) with Codecov upload in CI.
 - Added `Examples/ValidationHarness` to the solution and CI build validation.
 - Library now multi-targets `net8.0;net9.0;net10.0`.
 
@@ -18,6 +18,10 @@ The format is inspired by Keep a Changelog and uses semantic versioning.
 - Removed `TreatWarningsAsErrors=False` overrides so the root `TreatWarningsAsErrors=true` quality gate applies to Source, Tests, and samples.
 - Fixed machine-specific absolute paths in `Examples/SimpleOdataApi` project file.
 - Documented public strong-name key (`Key.snk`) rationale for OSS signing.
+
+### Fixed
+
+- Pinned `Microsoft.OpenApi` to `3.5.5` because `3.5.1` has high severity flaw GHSA-v5pm-xwqc-g5wc.
 
 ### Fixed
 

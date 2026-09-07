@@ -53,6 +53,7 @@ Current baseline:
 - .NET: `net8.0`, `net9.0`, `net10.0` (library multi-targets; samples and tests run on `net10.0`)
 - `Microsoft.AspNetCore.OData`: `9.4.1`
 - `Microsoft.OpenApi.OData`: `3.2.1`
+- `Microsoft.OpenApi`: `3.5.5` (floor pin, fixes GHSA-v5pm-xwqc-g5wc)
 - `Swashbuckle.AspNetCore.Swagger` / `SwaggerGen` / `SwaggerUI`: `10.1.7`
 
 Check [RELEASE_NOTES.md](./RELEASE_NOTES.md) for compatibility updates and breaking changes.

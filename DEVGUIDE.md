@@ -16,7 +16,7 @@ Run before opening or merging PRs:
 
 ```bash
 dotnet build Swashbuckle.AspNetCore.Community.OData.sln -c Release
-dotnet test --project Tests/Swashbuckle.AspNetCore.Community.OData.Test/Swashbuckle.AspNetCore.Community.OData.Test.csproj -c Release --collect:"XPlat Code Coverage"
+dotnet test --project Tests/Swashbuckle.AspNetCore.Community.OData.Test/Swashbuckle.AspNetCore.Community.OData.Test.csproj -c Release -- --coverage --coverage-output-format cobertura
 dotnet build Examples/ValidationHarness/ValidationHarness.csproj -c Release
 dotnet cake --target=Default
 ```
