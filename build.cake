@@ -43,7 +43,7 @@ Task("Test")
     {
         var processSettings = new ProcessSettings
         {
-            Arguments = $"test --project \"{project.FullPath}\" --configuration {configuration} --no-build --no-restore --collect:\"XPlat Code Coverage\" --results-directory \"./TestResults\" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura",
+            Arguments = $"test --project \"{project.FullPath}\" --configuration {configuration} --no-build --no-restore -- --coverage --coverage-output-format cobertura",
         };
 
         var exitCode = StartProcess("dotnet", processSettings);
