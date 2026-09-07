@@ -16,9 +16,14 @@ Run before opening or merging PRs:
 
 ```bash
 dotnet build Swashbuckle.AspNetCore.Community.OData.sln -c Release
-dotnet test --project Tests/Swashbuckle.AspNetCore.Community.OData.Test/Swashbuckle.AspNetCore.Community.OData.Test.csproj -c Release
+dotnet test --project Tests/Swashbuckle.AspNetCore.Community.OData.Test/Swashbuckle.AspNetCore.Community.OData.Test.csproj -c Release --collect:"XPlat Code Coverage"
+dotnet build Examples/ValidationHarness/ValidationHarness.csproj -c Release
 dotnet cake --target=Default
 ```
+
+The library multi-targets `net8.0;net9.0;net10.0`; tests and samples run on `net10.0`.
+Treat `TreatWarningsAsErrors=true` (root `Directory.Build.props`) as the quality gate — do not
+reintroduce per-project `TreatWarningsAsErrors=false` overrides without a tracked reason.
 
 Optional sample validation harness:
 

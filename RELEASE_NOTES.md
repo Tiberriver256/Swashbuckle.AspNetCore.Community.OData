@@ -8,7 +8,16 @@ The format is inspired by Keep a Changelog and uses semantic versioning.
 
 ### Added
 
+- Added XPlat Code Coverage collection (`coverlet.collector`) with Codecov upload in CI.
+- Added `Examples/ValidationHarness` to the solution and CI build validation.
+- Library now multi-targets `net8.0;net9.0;net10.0`.
+
 ### Changed
+
+- Cleared Dependabot backlog: GitHub Actions (`setup-dotnet` 5.2.0, `upload-artifact` 7.0.1, `download-artifact` 8.0.1, `codeql-action` 4.35.4, `release-drafter` 7.3.0) and NuGet (`Swashbuckle.AspNetCore` 10.1.7, `Microsoft.OpenApi.OData` 3.2.1, `MinVer` 7.0.0, `MSTest.Analyzers` 4.2.2, `Microsoft.SourceLink.GitHub` 10.0.300).
+- Removed `TreatWarningsAsErrors=False` overrides so the root `TreatWarningsAsErrors=true` quality gate applies to Source, Tests, and samples.
+- Fixed machine-specific absolute paths in `Examples/SimpleOdataApi` project file.
+- Documented public strong-name key (`Key.snk`) rationale for OSS signing.
 
 ### Fixed
 
