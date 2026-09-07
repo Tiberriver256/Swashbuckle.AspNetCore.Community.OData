@@ -38,12 +38,12 @@ Task("Build")
     });
 
 Task("Test")
-    .Description("Runs unit tests.")
+    .Description("Runs unit tests with coverage.")
     .DoesForEach(GetFiles("./Tests/**/*.csproj"), project =>
     {
         var processSettings = new ProcessSettings
         {
-            Arguments = $"test --project \"{project.FullPath}\" --configuration {configuration} --no-build --no-restore",
+            Arguments = $"test --project \"{project.FullPath}\" --configuration {configuration} --no-build --no-restore --collect:\"XPlat Code Coverage\" --results-directory \"./TestResults\" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura",
         };
 
         var exitCode = StartProcess("dotnet", processSettings);
