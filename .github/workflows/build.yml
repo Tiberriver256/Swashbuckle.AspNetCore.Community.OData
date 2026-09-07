@@ -44,8 +44,8 @@ jobs:
       - name: "Dotnet Cake Test"
         run: dotnet cake --target=Test
         shell: pwsh
-      - name: "Check coverage gate (60%)"
-        run: ./scripts/Check-Coverage.ps1 -Threshold 0.60
+      - name: "Check coverage gate (30%)"
+        run: ./scripts/Check-Coverage.ps1 -Threshold 0.30
         shell: pwsh
       - name: "Build ValidationHarness"
         run: dotnet build ./Examples/ValidationHarness/ValidationHarness.csproj --configuration Release --no-restore

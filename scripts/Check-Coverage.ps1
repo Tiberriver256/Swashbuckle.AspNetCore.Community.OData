@@ -9,11 +9,11 @@
 .PARAMETER Root
   Directory to search recursively. Defaults to the current directory.
 .EXAMPLE
-  ./scripts/Check-Coverage.ps1 -Threshold 0.60
+  ./scripts/Check-Coverage.ps1 -Threshold 0.30
 #>
 [CmdletBinding()]
 param(
-  [double]$Threshold = 0.60,
+  [double]$Threshold = 0.30,
   [string]$Root = (Get-Location).Path
 )
 

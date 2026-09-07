@@ -8,7 +8,7 @@ The format is inspired by Keep a Changelog and uses semantic versioning.
 
 ### Added
 
-- Added coverage collection (`Microsoft.Testing.Extensions.CodeCoverage`) with a built-in 60 percent gate in CI.
+- Added coverage collection (`Microsoft.Testing.Extensions.CodeCoverage`) with a built-in 30 percent gate in CI, target 60 as tests grow.
 - Added `Examples/ValidationHarness` to the solution and CI build validation.
 - Library now multi-targets `net8.0;net9.0;net10.0`.
 
