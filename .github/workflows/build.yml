@@ -47,8 +47,8 @@ jobs:
       - name: "Upload coverage to Codecov"
         uses: codecov/codecov-action@v5.4.3
         with:
-          directory: ./TestResults
           fail_ci_if_error: false
+          use_oidc: true
           verbose: true
       - name: "Build ValidationHarness"
         run: dotnet build ./Examples/ValidationHarness/ValidationHarness.csproj --configuration Release --no-restore
