@@ -8,7 +8,7 @@ The format is inspired by Keep a Changelog and uses semantic versioning.
 
 ### Added
 
-- Added coverage collection (`Microsoft.Testing.Extensions.CodeCoverage`) with Codecov upload in CI.
+- Added coverage collection (`Microsoft.Testing.Extensions.CodeCoverage`) with a built-in 60 percent gate in CI.
 - Added `Examples/ValidationHarness` to the solution and CI build validation.
 - Library now multi-targets `net8.0;net9.0;net10.0`.
 
@@ -22,8 +22,6 @@ The format is inspired by Keep a Changelog and uses semantic versioning.
 ### Fixed
 
 - Pinned `Microsoft.OpenApi` to `3.5.5` because `3.5.1` has high severity flaw GHSA-v5pm-xwqc-g5wc.
-
-### Fixed
 
 ## [2.0.1] - 2026-02-08
 
