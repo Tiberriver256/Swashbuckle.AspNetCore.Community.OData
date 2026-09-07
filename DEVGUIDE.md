@@ -21,6 +21,14 @@ dotnet build Examples/ValidationHarness/ValidationHarness.csproj -c Release
 dotnet cake --target=Default
 ```
 
+Check the coverage gate locally (needs `pwsh`):
+
+```bash
+./scripts/Check-Coverage.ps1 -Threshold 0.30
+```
+
+Raise the floor as tests grow, target 60.
+
 The library multi-targets `net8.0;net9.0;net10.0`; tests and samples run on `net10.0`.
 Treat `TreatWarningsAsErrors=true` (root `Directory.Build.props`) as the quality gate — do not
 reintroduce per-project `TreatWarningsAsErrors=false` overrides without a tracked reason.

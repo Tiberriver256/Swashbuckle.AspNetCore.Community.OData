@@ -44,12 +44,9 @@ jobs:
       - name: "Dotnet Cake Test"
         run: dotnet cake --target=Test
         shell: pwsh
-      - name: "Upload coverage to Codecov"
-        uses: codecov/codecov-action@v5.4.3
-        with:
-          fail_ci_if_error: false
-          use_oidc: true
-          verbose: true
+      - name: "Check coverage gate (30%)"
+        run: ./scripts/Check-Coverage.ps1 -Threshold 0.30
+        shell: pwsh
       - name: "Build ValidationHarness"
         run: dotnet build ./Examples/ValidationHarness/ValidationHarness.csproj --configuration Release --no-restore
         shell: pwsh
