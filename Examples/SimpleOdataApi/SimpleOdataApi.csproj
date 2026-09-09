@@ -3,14 +3,8 @@
     <TargetFramework>net10.0</TargetFramework>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
-  </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.1.2" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.1.7" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Source\Swashbuckle.AspNetCore.Community.OData\Swashbuckle.AspNetCore.Community.OData.csproj" />
@@ -19,9 +13,9 @@
     <PackageReference Update="Microsoft.VisualStudio.Threading.Analyzers" Version="17.11.20" />
   </ItemGroup>
   <ItemGroup>
-    <EditorConfigFiles Remove="C:\my\personal\Swashbuckle.AspNetCore.Community.OData\Examples\SimpleOdataApi\.editorconfig" />
+    <EditorConfigFiles Remove=".editorconfig" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="C:\my\personal\Swashbuckle.AspNetCore.Community.OData\Examples\SimpleOdataApi\.editorconfig" />
+    <None Include=".editorconfig" />
   </ItemGroup>
 </Project>
