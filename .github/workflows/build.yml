@@ -34,7 +34,7 @@ jobs:
           lfs: true
           fetch-depth: 0
       - name: "Install .NET Core SDK"
-        uses: actions/setup-dotnet@v5.1.0
+        uses: actions/setup-dotnet@v5.2.0
       - name: "Dotnet Tool Restore"
         run: dotnet tool restore
         shell: pwsh
@@ -44,11 +44,17 @@ jobs:
       - name: "Dotnet Cake Test"
         run: dotnet cake --target=Test
         shell: pwsh
+      - name: "Check coverage gate (30%)"
+        run: ./scripts/Check-Coverage.ps1 -Threshold 0.30
+        shell: pwsh
+      - name: "Build ValidationHarness"
+        run: dotnet build ./Examples/ValidationHarness/ValidationHarness.csproj --configuration Release --no-restore
+        shell: pwsh
       - name: "Dotnet Cake Pack"
         run: dotnet cake --target=Pack
         shell: pwsh
       - name: "Publish Artefacts"
-        uses: actions/upload-artifact@v6.0.0
+        uses: actions/upload-artifact@v7.0.1
         with:
           name: ${{matrix.os}}
           path: "./Artefacts"
@@ -65,7 +71,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: "Download Artefact"
-        uses: actions/download-artifact@v7.0.0
+        uses: actions/download-artifact@v8.0.1
         with:
           name: "windows-latest"
       - name: "Dotnet NuGet Add Source"
@@ -89,7 +95,7 @@ jobs:
     runs-on: windows-latest
     steps:
       - name: "Download Artefact"
-        uses: actions/download-artifact@v7.0.0
+        uses: actions/download-artifact@v8.0.1
         with:
           name: "windows-latest"
       - name: "Validate package version matches release tag"
