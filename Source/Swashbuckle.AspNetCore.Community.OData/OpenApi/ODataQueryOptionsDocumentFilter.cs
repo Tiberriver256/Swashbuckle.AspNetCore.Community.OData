@@ -262,10 +262,10 @@ namespace Swashbuckle.AspNetCore.Community.OData.OpenApi
                 Type = JsonSchemaType.String,
                 Enum =
                     [
-                        JsonValue.Create("application/json")!,
-                        JsonValue.Create("application/json;odata.metadata=none")!,
-                        JsonValue.Create("application/json;odata.metadata=minimal")!,
-                        JsonValue.Create("application/json;odata.metadata=full")!
+                        JsonValue.Create("application/json"),
+                        JsonValue.Create("application/json;odata.metadata=none"),
+                        JsonValue.Create("application/json;odata.metadata=minimal"),
+                        JsonValue.Create("application/json;odata.metadata=full")
                     ]
             }
         };
