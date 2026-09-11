@@ -4,7 +4,7 @@
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.1.7" />
+    <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="10.2.3" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Source\Swashbuckle.AspNetCore.Community.OData\Swashbuckle.AspNetCore.Community.OData.csproj" />
